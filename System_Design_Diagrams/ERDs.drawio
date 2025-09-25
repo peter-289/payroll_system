@@ -1,0 +1,222 @@
+<mxfile host="65bd71144e">
+    <diagram id="4fH-lKLLjk4Qr7HQYIz4" name="Page-1">
+        <mxGraphModel dx="2002" dy="1363" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="24" value="Role_Permission" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="280" width="150" height="60" as="geometry">
+                        <mxRectangle x="560" y="1320" width="160" height="120" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="25" value="- role_id:int(FK)&lt;div&gt;- permission_id: int(FK)&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="24">
+                    <mxGeometry y="50" width="160" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="Pension" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="735" y="340" width="90" height="60" as="geometry">
+                        <mxRectangle x="75" y="1030" width="210" height="200" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="34" value="- pension_id: int(PK)&lt;div&gt;- employee_id: int(FK)&lt;/div&gt;&lt;div&gt;- scheme_name: text&lt;/div&gt;&lt;div&gt;- pension_number: int&lt;/div&gt;&lt;div&gt;- employer_contribution_percentage&lt;/div&gt;&lt;div&gt;- employee_contribution_percentage&lt;/div&gt;&lt;div&gt;- monthly_contribution: int&lt;/div&gt;&lt;div&gt;- start_date: datetime&lt;/div&gt;&lt;div&gt;- status: text&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="33">
+                    <mxGeometry y="50" width="210" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="Insurance" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="725" y="160" width="100" height="70" as="geometry">
+                        <mxRectangle x="260" y="1050" width="160" height="230" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="- insurance_id: int(PK)&lt;div&gt;- employee_id: int(FK)&lt;/div&gt;&lt;div&gt;- insurance_provider: text&lt;/div&gt;&lt;div&gt;- policy_number: int&lt;/div&gt;&lt;div&gt;- coverage_type: text&lt;/div&gt;&lt;div&gt;- premium_amount: int&lt;/div&gt;&lt;div&gt;- employer_contribution: int&lt;/div&gt;&lt;div&gt;- employee_contribution: int&lt;/div&gt;&lt;div&gt;- start_date: datetime&lt;/div&gt;&lt;div&gt;- end_date: datetime&lt;/div&gt;&lt;div&gt;- status: text&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="35">
+                    <mxGeometry y="50" width="160" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="Loans and advances" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="690" y="250" width="170" height="70" as="geometry">
+                        <mxRectangle x="10" y="800" width="160" height="260" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="38" value="&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- loan_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- employee_id: int(FK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- type: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- principle_amount: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- balance_amount: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- installment_amount: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- interest_rate: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- start_date: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- end_date: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- status: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- description: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- created_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;- updated_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin: 0px 0px 0px 4px;&quot;&gt;&lt;br style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap;&quot;&gt;&lt;/p&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="37">
+                    <mxGeometry y="50" width="160" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="Tax" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="310" y="270" width="80" height="70" as="geometry">
+                        <mxRectangle x="290" y="810" width="180" height="270" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="41" value="&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- tax_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- description: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- type: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- rate: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- threshold_min: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- fixed_amount: currency&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- effective_date: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- expiry_date: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- created_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- updated_at: datetime&lt;/p&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="40">
+                    <mxGeometry y="50" width="180" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="Deductions" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="295" y="350" width="110" height="65" as="geometry">
+                        <mxRectangle x="360" y="820" width="160" height="240" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="43" value="&lt;hr style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; border-style: solid;&quot; size=&quot;1&quot;&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;+ deduction_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- payroll_id: int(FK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;&lt;span style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); background-color: transparent; color: rgb(63, 63, 63);&quot;&gt;- type: text&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;&lt;span style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); background-color: transparent; color: rgb(63, 63, 63);&quot;&gt;- amount: currency&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;&lt;span style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); background-color: transparent; color: rgb(63, 63, 63);&quot;&gt;- description: text&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;&lt;span style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); background-color: transparent; color: rgb(63, 63, 63);&quot;&gt;- created_at: datetime&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;&lt;span style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); background-color: transparent; color: rgb(63, 63, 63);&quot;&gt;- updated_at: datetime&lt;/span&gt;&lt;/p&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="42">
+                    <mxGeometry y="50" width="160" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="Allowances" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="725" y="70" width="110" height="70" as="geometry">
+                        <mxRectangle x="250" y="365" width="190" height="215" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="47" value="&lt;hr style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; border-style: solid;&quot; size=&quot;1&quot;&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- allowance_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- payroll_id: int(FK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- type: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- amount: currency&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- description: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- created_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- updated_at: datetime&lt;/p&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="46">
+                    <mxGeometry y="50" width="190" height="165" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="Position" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="10" y="230" width="110" height="70" as="geometry">
+                        <mxRectangle x="230" y="290" width="220" height="230" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="49" value="&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- role_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- title: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- department_id: int(FK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- base_salary: currency&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- pay_grade: varchar&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- employment_type: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- created_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- updated_at: datetime&lt;/p&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="48">
+                    <mxGeometry y="50" width="220" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="User" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="560" y="-10" width="70" height="60" as="geometry">
+                        <mxRectangle x="20" y="1350" width="250" height="290" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="17" value="- user_id(PK)&lt;br&gt;- username&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;- email: text&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;- password_hash: varchar&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;- role_id: int(FK)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;- employee_id:(FK)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;- status: text&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;-last_login: datetime&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;- created_at: datetime&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;text-wrap-mode: wrap; background-color: transparent;&quot;&gt;- updated_at: datetime&lt;/span&gt;&lt;div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="16">
+                    <mxGeometry y="50" width="250" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERone;endFill=1;" edge="1" parent="16">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="-60" y="120" as="sourcePoint"/>
+                        <mxPoint x="40" y="20" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="18" value="Employee" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=8;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="440" y="80" width="110" height="70" as="geometry">
+                        <mxRectangle x="250" y="1320" width="230" height="360" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="19" value="&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-employee_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-first_name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-last_name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-middle_name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-gender: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-date_of_birth: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-national_id: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-email: varchar&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-phone: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-address: varchar&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-hire_date: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-employment_status: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-job_role_id: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-department_id: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-salary_type: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-bank_account_number: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-bank_name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-created_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;-updated_at: datetime&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="18">
+                    <mxGeometry y="50" width="230" height="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="18">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="67.5" y="180" as="sourcePoint"/>
+                        <mxPoint y="25" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="-12.5" y="65"/>
+                            <mxPoint x="17.5" y="95"/>
+                            <mxPoint x="-22.5" y="115"/>
+                            <mxPoint x="-22.5" y="65"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="20" value="Department" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="720" width="110" height="60" as="geometry">
+                        <mxRectangle x="360" y="1220" width="160" height="250" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="21" value="&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- department_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- name: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- description: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- manager_id: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- location: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- created_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- updated_at: datetime&lt;/p&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="20">
+                    <mxGeometry y="50" width="160" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="Payroll" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="310" y="180" width="80" height="70" as="geometry">
+                        <mxRectangle x="325" y="200" width="190" height="400" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="23" value="&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- payroll_id: int(PK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- employee_id: int(FK)&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- pay_period_start: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- pay_period_end: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- basic_salary: currency&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- gross_salary: currency&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- total_deductions: currency&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- net_salary: currency&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- payment_date: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- status: text&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- bank_transaction_id: int&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- created_at: datetime&lt;/p&gt;&lt;p style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: wrap; margin: 0px 0px 0px 4px;&quot;&gt;- updated_at: datetime&lt;/p&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="22">
+                    <mxGeometry y="50" width="190" height="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="Permissions" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="-10" y="60" width="120" height="70" as="geometry">
+                        <mxRectangle x="15" y="1180" width="160" height="120" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="30" value="- permission_id: int(PK)&lt;div&gt;- permission_name: text&lt;/div&gt;&lt;div&gt;- description&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="29">
+                    <mxGeometry y="50" width="160" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="Roles" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+                    <mxGeometry x="60" y="140" width="80" height="70" as="geometry">
+                        <mxRectangle x="180" y="1180" width="160" height="120" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="32" value="- role_id: int(PK)&lt;div&gt;- role_name: text&lt;/div&gt;&lt;div&gt;- description: text&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="31">
+                    <mxGeometry y="50" width="160" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="55" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0.009;exitY=0.64;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="20" target="18">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="390" y="300" as="sourcePoint"/>
+                        <mxPoint x="490" y="200" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="130" y="80"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="59" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="48" target="18">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="180" y="230" as="sourcePoint"/>
+                        <mxPoint x="175" y="100" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="165" y="140"/>
+                            <mxPoint x="180" y="100"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="61" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;entryX=1.013;entryY=0.157;entryDx=0;entryDy=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryPerimeter=0;" edge="1" parent="1" source="18" target="22">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="390" y="300" as="sourcePoint"/>
+                        <mxPoint x="490" y="200" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="63" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="46">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="420" y="200" as="sourcePoint"/>
+                        <mxPoint x="580" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="66" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="22" target="37">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="440" y="250" as="sourcePoint"/>
+                        <mxPoint x="460" y="385" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="68" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="22" target="33">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="450" y="200" as="sourcePoint"/>
+                        <mxPoint x="590" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="70" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;exitX=0.975;exitY=0.4;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitPerimeter=0;" edge="1" parent="1" source="22" target="35">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="490" y="250" as="sourcePoint"/>
+                        <mxPoint x="590" y="150" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="72" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;exitX=1.025;exitY=0.629;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="22" target="42">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="420" y="233" as="sourcePoint"/>
+                        <mxPoint x="500" y="330" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="460" y="350"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="73" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="31" target="16">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="150" y="120" as="sourcePoint"/>
+                        <mxPoint x="250" y="20" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="74" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;startArrow=ERzeroToMany;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="1" source="31" target="24">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="80" y="150" as="sourcePoint"/>
+                        <mxPoint x="180" y="50" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="76" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToOne;startArrow=ERmandOne;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="18" target="16">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="460" y="140" as="sourcePoint"/>
+                        <mxPoint x="560" y="37.5" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="77" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;startArrow=ERoneToMany;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="29" target="24">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="140" y="120" as="sourcePoint"/>
+                        <mxPoint x="240" y="20" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
