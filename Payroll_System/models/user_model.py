@@ -22,6 +22,4 @@ class User(Base):
     role = relationship("Role", back_populates="users")
     employee = relationship("Employee", back_populates="user")
 
-    def __repr__(self):
-        return f"<User(username={self.username}, email={self.email}, role_id={self.role_id})>"
-
+    
