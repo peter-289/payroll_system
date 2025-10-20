@@ -1,7 +1,7 @@
 This project is a payroll management system that allows users of an enterprise to:
 1 --> Register as employees
-2 --> View there payrolls
-3 --> Print there payrolls
+2 --> View their payrolls
+3 --> Print their payrolls
 
 ## --PROJECT FEATURES--
 
