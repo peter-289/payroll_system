@@ -1,0 +1,27 @@
+.env
+*.pyc
+__pycache__/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+.env
+venv/
+.env/
+instance/
+.mypy_cache/
+.pytest_cache/
+
+# === VS Code ===
+.vscode/
+
+# === System Files ===
+.DS_Store
+Thumbs.db
+
+# === OS Generated Files ===
+*.swp
+*.swo
