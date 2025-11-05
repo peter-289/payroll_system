@@ -1,15 +1,12 @@
-from database import Base
+from backend.database_setups.database_setup import Base
 from sqlalchemy import Column, Integer, ForeignKey
-from sqlalchemy.orm import relationship
 
 
-class Role_Permission(Base):
-    __tablename__ = "role_permission"
 
-    role_id = Column (Integer, ForeignKey("role.role_id"), primary_key=True, index=True)
-    permission_id = Column(Integer, ForeignKey("permission.permission_id"))
+class RolePermission(Base):
+    __tablename__ = "role_permissions"
 
-    ##____RELATIONSHIPS____
-    role_permission = relationship("Roles", back_populates="role")
-    role_permission = relationship("Permission", back_populates="permission")
+    role_id = Column(Integer, ForeignKey("roles.role_id"), primary_key=True)
+    permission_id = Column(Integer, ForeignKey("permissions.id"), primary_key=True)
 
+   

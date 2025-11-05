@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Email Verified — Next Step</title>
+    <style>
+        :root{--bg:#f6f8fb;--card:#fff;--accent:#1572e8;--muted:#6b7280}
+        html,body{height:100%}
+        body{
+            margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+            background:linear-gradient(180deg,#f8fbff 0%,var(--bg) 100%); color:#0f172a;
+            display:flex; align-items:center; justify-content:center; padding:24px;
+        }
+        .card{
+            background:var(--card); border-radius:12px; box-shadow:0 6px 30px rgba(16,24,40,0.08);
+            max-width:720px; width:100%; padding:32px; display:flex; gap:24px; align-items:center;
+        }
+        .icon{
+            flex:0 0 88px; height:88px; border-radius:999px; background:linear-gradient(135deg,#e6f0ff,#dff4ff);
+            display:flex; align-items:center; justify-content:center;
+        }
+        .icon svg{width:44px; height:44px; color:var(--accent)}
+        h1{margin:0 0 8px; font-size:20px}
+        p.lead{margin:0 0 16px; color:var(--muted)}
+        .actions{display:flex; gap:12px; margin-top:6px; flex-wrap:wrap}
+        .btn{
+            appearance:none; border:0; padding:10px 16px; border-radius:8px; cursor:pointer;
+            font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:10px;
+        }
+        .btn-primary{background:var(--accent); color:#fff}
+        .btn-outline{background:transparent; color:var(--accent); border:1px solid rgba(21,114,232,0.12)}
+        .notes{margin-top:18px; color:var(--muted); font-size:13px}
+        ul.check{margin:12px 0 0; padding-left:20px; color:var(--muted)}
+        @media (max-width:640px){
+            .card{flex-direction:column; text-align:center}
+            .icon{margin-bottom:4px}
+        }
+    </style>
+</head>
+<body>
+    <main class="card" role="main" aria-labelledby="title">
+        <div class="icon" aria-hidden="true">
+            <!-- simple check icon -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.12" stroke-width="2"/>
+                <path d="M7.5 12.5l2.5 2.5L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+        <div>
+            <h1 id="title">Email verified successfully</h1>
+            <p class="lead">Your email address has been confirmed. You're one step closer to completing your employee profile.</p>
+
+            <div class="actions" role="group" aria-label="Next steps">
+                <!-- If using a templating engine, replace href values with your app's URLs -->
+                <a class="btn btn-primary" href="{{registration_url}}">
+                    Proceed to Employee Registration
+                </a>
+                <a class="btn btn-outline" href="{{ login_url or '/login' }}">
+                    Sign in / Dashboard
+                </a>
+            </div>
+
+            <div class="notes" aria-live="polite">
+                <strong>Before you continue:</strong>
+                <ul class="check">
+                    <li>Have a valid government ID and employment details ready (employee ID, department, start date).</li>
+                    <li>Contact HR at <a href="mailto:hr@example.com">hr@example.com</a> if you need assistance.</li>
+                    <li>If the registration link doesn't work, copy and paste this URL into your browser: <code>{{ registration_url or '/employee/register' }}</code></li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from database import Base
+from backend.database_setups.database_setup import Base
 from sqlalchemy import Column, Integer, String, Date
 from datetime import datetime
 

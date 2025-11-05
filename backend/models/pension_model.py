@@ -1,6 +1,6 @@
 from sqlalchemy import String, Integer, Float, DateTime, ForeignKey, Column
 from sqlalchemy.orm import relationship
-from database import Base
+from backend.database_setups.database_setup import Base
 from datetime import datetime
 
 class Pension(Base):
@@ -18,7 +18,8 @@ class Pension(Base):
     updated_at = Column(DateTime, default=datetime.utcnow)
 
 ##_____RELATIONSHIPS____
-    pension = relationship("Eployees", back_populates="employee")
+    # link back to employee
+    employee = relationship("Employee", back_populates="pensions")
 
 
    
