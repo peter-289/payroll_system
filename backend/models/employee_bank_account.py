@@ -9,8 +9,8 @@ from datetime import datetime
 class EmployeeBankAccount(Base):
     __tablename__ = "employee_bank_accounts"
 
-    account_id = Column(Integer, primary_key=True, index=True)
-    employee_id = Column(Integer, ForeignKey("employees.employee_id", ondelete="CASCADE"), nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, ForeignKey("employees.id", ondelete="CASCADE"), nullable=False)
     bank_name = Column(String(100), nullable=False)
     account_number = Column(String(30), nullable=False)
     account_type = Column(String(20), nullable=True)  # e.g., Savings, Checking

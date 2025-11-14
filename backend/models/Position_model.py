@@ -7,10 +7,10 @@ from sqlalchemy.orm import relationship
 class Position(Base):
     __tablename__ = "positions"
 
-    position_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     title = Column(String)
-    department_id = Column(Integer, ForeignKey("departments.department_id"))
-    role_id = Column(Integer, ForeignKey("roles.role_id"))
+    department_id = Column(Integer, ForeignKey("departments.id"))
+    role_id = Column(Integer, ForeignKey("roles.id"))
     base_salary = Column(Float)
     # optional position-specific multiplier on top of base salary (default 1.0)
     salary_multiplier = Column(Float, default=1.0)

@@ -7,8 +7,8 @@ from sqlalchemy.orm import relationship
 class Insurance(Base):
     __tablename__ = 'insurances'
 
-    insurance_id = Column(Integer, primary_key=True, index=True)
-    employee_id = Column(Integer, ForeignKey('employees.employee_id'), nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, ForeignKey('employees.id'), nullable=False)
     insurance_provider = Column(String, nullable=False)
     policy_number = Column(String, nullable=False, unique=True)
     coverage_type = Column(String, nullable=False)

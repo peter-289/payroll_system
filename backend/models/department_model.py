@@ -8,11 +8,11 @@ from backend.models.employee_model import Employee
 class Department(Base):
     __tablename__ = "departments"
 
-    department_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, unique=True)
     description = Column(String)
     # manager refers to an employee id
-    manager_id = Column(Integer, ForeignKey("employees.employee_id"), nullable=True)
+    manager_id = Column(Integer, ForeignKey("employees.id"), nullable=True)
     location = Column(String, nullable=True)
     # department-level salary multiplier (e.g., engineering 1.15)
     salary_multiplier = Column(Float, default=1.0)

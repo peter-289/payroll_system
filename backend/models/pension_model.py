@@ -6,8 +6,8 @@ from datetime import datetime
 class Pension(Base):
     __tablename__ = "pensions"
 
-    pension_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    employee_id = Column(Integer, ForeignKey("employees.employee_id"))
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    employee_id = Column(Integer, ForeignKey("employees.id"))
     scheme_name = Column(String )
     pension_number = Column(Integer)
     employer_contribution_percentage = Column(Float)

@@ -6,8 +6,8 @@ from datetime import datetime
 class Allowance(Base):
     __tablename__ = "allowances"
 
-    allowance_id = Column(Integer, primary_key=True)
-    payroll_id = Column(Integer, ForeignKey("payrolls.payroll_id"), nullable=False)
+    id = Column(Integer, primary_key=True)
+    payroll_id = Column(Integer, ForeignKey("payrolls.id"), nullable=False)
     name = Column(Text, nullable=False)
     type = Column(Text, nullable=False)
     amount = Column(Float, nullable=False)

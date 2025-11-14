@@ -78,14 +78,14 @@ def seed_role_permissions(db: Session):
 
             # Avoid duplicate entries in join table
             exists = db.query(RolePermission).filter_by(
-                role_id=role.role_id,
+                role_id=role.id,
                 permission_id=perm.id
             ).first()
             if exists:
                 print(f"Role '{role_name}' already has permission '{perm_name}', skipping.")
                 continue
 
-            db.add(RolePermission(role_id=role.role_id, permission_id=perm.id))
+            db.add(RolePermission(role_id=role.id, permission_id=perm.id))
             print(f"Assigned permission '{perm_name}' to role '{role_name}'")
 
     try:
@@ -145,11 +145,11 @@ def seed_positions(db):
             new_pos = Position(
                 title=pos["title"],
                 base_salary=pos["base_salary"],
-                department_id=pos["department"].department_id
+                department_id=pos["department"].id
             )
             db.add(new_pos)
-            print(f"👌Added position:{pos["title"]}")
+            print(f"👌Added position:{pos['title']}")
         else:
-            print(f"😎Position already exists:{pos["title"]}")
+            print(f"😎Position already exists:{pos['title']}")
     db.commit()
     print("✅ Positions seeded successfully.")

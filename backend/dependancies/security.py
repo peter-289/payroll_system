@@ -8,22 +8,21 @@ import binascii
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy.orm import Session
-from backend.database_setups.database_setup import get_db
 from backend.models.user_model import User
 from pydantic import BaseModel
+from backend.models.employee_model import Employee
+from sqlalchemy.orm import Session
+from backend.database_setups.database_setup import get_db
+from config import LOGIN_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 
-# Security configuration
-SECRET_KEY = "YOUR-SECRET-KEY-HERE"  # In production, use environment variable
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+#======================================================================================================
+#------------------------ TOKEN DATA ---------------------------------------------------------------
 class TokenData(BaseModel):
     username: Optional[str] = None
     permissions: List[str] = []
@@ -49,23 +48,26 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return result == 0
     except Exception:
         return False
+    
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """Create a new JWT access token."""
+
+#======================================================================================================
+#------------------------ CREATE A LOGIN TOKEN TO MANAGE SESSIONS -------------------------------------
+def create_login_token(data:dict, expires_delta:timedelta | None = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=LOGIN_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp":expire})
+    token = jwt.encode(to_encode,SECRET_KEY, algorithm=ALGORITHM)
+    return token
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
-) -> User:
-    """Get the current authenticated user from the JWT token."""
+
+
+#======================================================================================================
+#------------------------ DECODE TOKEN ---------------------------------------------------------------
+def get_current_employee(
+    token: str = Depends(oauth2_scheme)
+):
+    """Get the current authenticated employee from the JWT token."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -73,37 +75,53 @@ def get_current_user(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        user_id: int = payload.get("sub")
+        employee_id: int = payload.get("employee_id")
+        role: str = payload.get("role")
+        if user_id is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        
     except JWTError:
         raise credentials_exception
 
-    user = db.query(User).filter(User.username == token_data.username).first()
-    if user is None:
-        raise credentials_exception
-    return user
+    return {
+        "employee_id": employee_id, "user_id": user_id,"role":role
+    }
 
-def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
-    """Get the current active user, checking if they're not disabled."""
-    if current_user.status != "active":
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
 
-async def check_admin_access(current_user: User = Depends(get_current_active_user)) -> User:
-    """Check if the current user has admin privileges."""
-    if not current_user.role or current_user.role.name != "admin":
+
+#======================================================================================================
+#------------------------ GET CURRENT ACTIVE USER ---------------------------------------------------
+
+
+#======================================================================================================
+#------------------------ CHECK ADMIN ACCESS -------------------------------------------------------
+def admin_access(
+    current_employee: dict = Depends(get_current_employee)
+):
+    if current_employee.get("role") != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions"
+            detail="Admin access required"
         )
-    return current_user
+    return current_employee
 
-#------------------------------------------------------------------------------------------------
-#           ----- PARSE DATE ------
-#------------------------------------------------------------------------------------------------
 
+#======================================================================================================
+#------------------------ CHECK HR ACCESS -------------------------------------------------------------
+def hr_access(
+    current_employee: dict = Depends(get_current_employee)
+):
+    if current_employee.get("role") != "hr":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="HR access required"
+        )
+    return current_employee
+
+
+#======================================================================================================
+#------------------------ PARSE DATE FROM DIFFERENT FORMATS ---------------------------------------------
 def parse_date(date:str):
     raw = date.strip()
 
@@ -131,3 +149,16 @@ def parse_date(date:str):
             "DD-MM-YYYY, YYYY/MM/DD, 'Jan 31, 2000' or '31 Jan 2000'"
         )
     )
+
+
+#------------------------------------------------------------------------------------------------
+#           ----- CREATE TEMPORARY PASSWORD ------
+#------------------------------------------------------------------------------------------------
+def create_temporary_password(length:int = 12) -> str:
+    """Generate a random temporary password of specified length."""
+    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()"
+    password = ''.join(
+        characters[os.urandom(1)[0] % len(characters)]
+        for _ in range(length)
+    )
+    return password
