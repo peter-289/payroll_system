@@ -49,7 +49,7 @@ def login(
 #---------------------------------------------------------------------------------------------------------
 #              ------------ CHANGE PASSWORD FOR FIRST TIMERS -----------------
 #---------------------------------------------------------------------------------------------------------
-@router.post("/change-password", dependencies=[Depends(get_current_employee)])
+@router.post("/change-password")
 def change_password(
     user_id:int = Form(...),
     new_password:str = Form(...),

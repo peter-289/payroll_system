@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from fastapi_mail import ConnectionConfig
+#from fastapi_mail import ConnectionConfig
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -26,15 +26,6 @@ BASE_DIR = Path(__file__).parent
 #------------------------------------------------------------------------------------------------------
 # ------------------------------ EMAIL CONFIG ---------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
-mail_config = ConnectionConfig(
-    MAIL_USERNAME=os.getenv("EMAIL_USERNAME", ""),
-    MAIL_PASSWORD=os.getenv("EMAIL_PASSWORD", ""),
-    MAIL_FROM=os.getenv("EMAIL_FROM", "tech_pulse@techpulse.com"),
-    MAIL_PORT=int(os.getenv("EMAIL_PORT", "1025")),
-    MAIL_SERVER=os.getenv("EMAIL_HOST", "localhost"),
-    MAIL_STARTTLS=os.getenv("EMAIL_USE_TLS", "false").lower() == "true",
-    MAIL_SSL_TLS=os.getenv("EMAIL_USE_SSL", "false").lower() == "true",
-    USE_CREDENTIALS=bool(os.getenv("EMAIL_USERNAME")), # Only use credentials if username is set
-    VALIDATE_CERTS=os.getenv("EMAIL_USE_TLS", "false").lower() == "true",
-   # TEMPLATE_FOLDER=BASE_DIR / "UI" / "email_templates"  # Set absolute path to templates
-)
+#mail_config = ConnectionConfig(
+   # MAIL_USERNAME=os.getenv("EMAIL_USERNAME", ""),
+    #

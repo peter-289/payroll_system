@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from backend.models.employee_model import Employee
 from sqlalchemy.orm import Session
 from backend.database_setups.database_setup import get_db
-from config import LOGIN_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+from backend.config import LOGIN_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 

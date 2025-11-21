@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, computed_field
 from datetime import date
 from typing import Optional
 
@@ -24,9 +24,14 @@ class EmployeeResponseSchema(BaseModel):
     id: int
     first_name: str
     last_name: str
-    username: str
-    email: EmailStr
-    role_name: str  
+    date_of_birth: Optional[date] = None
+    employment_status: str  
+    salary_type: str
+    #department_name: Optional[str] = None
+    #position_title: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+   

@@ -2,7 +2,7 @@ from backend.models.roles_model import Role
 from sqlalchemy.orm import Session
 from backend.models.user_model import User
 from backend.dependancies.security import hash_password, verify_password
-from config import ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD
+from backend.config import ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD
 
 
 def seed_admin(db:Session):
