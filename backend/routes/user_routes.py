@@ -9,7 +9,7 @@ from backend.models.Position_model import Position
 from backend.models.department_model import Department
 from backend.models.employee_bank_account import EmployeeBankAccount
 from backend.models.employee_contacts_details import EmployeeContact
-from backend.schemas.employee_schema import EmployeeCreateSchema, EmployeeResponseSchema
+from backend.schemas.employee_schema import EmployeeCreate, EmployeeResponse as EmployeeCreateSchema, EmployeeResponse as EmployeeResponseSchema
 from sqlalchemy.orm import joinedload
 
 
