@@ -28,7 +28,8 @@ class PositionUpdate(BaseModel):
 
 
 class PositionResponse(PositionBase):
-    position_id: int
+    title:str
+    id: int
     created_at: datetime
     updated_at: datetime
 

@@ -1,43 +1,54 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from backend.database_setups.database_setup import get_db
-from backend.dependancies.security import  admin_access
-from backend.models.Position_model import Position
-from backend.models.department_model import Department
+from backend.services.department_service import DepartmentService
+from typing import List
+from backend.schemas.department_schema import DepartmentResponse, DepartmentCreate
+from backend.schemas.position_schema import PositionResponse
+from fastapi.responses import JSONResponse
+
+router = APIRouter(prefix="/api/v1", tags=["Department"])
 
 
-router = APIRouter(prefix="/api",
-                 tags=["Departments"],
-                 dependencies=[Depends(admin_access)]
-                   )
-
-
-
-#======================================================================================================
-#----------------------------- GET ALL DEPARTMENTS -------------------------------------------------
-@router.get("/departments-all")
-def get_all_departments(
-    db: Session = Depends(get_db),
-    #admin_user: User = Depends(check_admin_access)
+#=====================================================================================================
+#-------------------------- ADD DEPARTMENT -----------------------------------------------------------
+@router.post("/department", response_model=DepartmentResponse, status_code=201)
+def add_departments(
+    payload:DepartmentCreate,
+    db:Session = Depends(get_db)
 ):
-    departments = db.query(Department).all()
-    return [{"id": dept.id, "name": dept.name} for dept in departments]
-
+    service = DepartmentService(db)    
+    new_department = service.add_department(payload)
+    return new_department
 
 
 #======================================================================================================
-#----------------------------- GET POSITIONS BY DEPARTMENT ------------------------------------------
-@router.get("/positions-by-department/{department_name}")
+#----------------------------- GET POSITIONS BY DEPARTMENT --------------------------------------------
+@router.get("/departments/{department_id}/positions", response_model=List[PositionResponse])
 def get_positions_by_department(
-    department_name: str,
-    db: Session = Depends(get_db),
-    #admin_user: User = Depends(check_admin_access)
-):
-    department = db.query(Department).filter(Department.name == department_name).first()
-    if not department:
-        raise HTTPException(status_code=404, detail="Department not found")
-    
-    positions = db.query(Position).filter(Position.department_id == department.id).all()
-    return [{"id": pos.id, "title": pos.title} for pos in positions]
+    department_id: int,
+    db: Session = Depends(get_db)):
+    service = DepartmentService(db)
+    positions = service.get_positions_by_department(department_id)
+    return positions
+
+#======================================================================================================
+#----------------------------- GET ALL DEPARTMENTS ----------------------------------------------------
+@router.get("/departments", response_model=List[DepartmentResponse])
+def get_all_departments(db: Session = Depends(get_db)):
+    service = DepartmentService(db)
+    departments = service.get_all_departments()
+    return departments
+
+#=====================================================================================================
+#---------------------------- DELETE DEPARTMENT BY ID ------------------------------------------------
+@router.delete("/departments/{department_id}")
+def delete_department(department_id:int, db:Session = Depends(get_db)):
+    service = DepartmentService(db)
+    service.delete_department(department_id)
+    return JSONResponse(
+            status_code=200,
+            content={"message":f"Department with id:{department_id} removed successfully!"}
+        )
 
 

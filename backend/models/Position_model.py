@@ -12,7 +12,6 @@ class Position(Base):
     department_id = Column(Integer, ForeignKey("departments.id"))
     role_id = Column(Integer, ForeignKey("roles.id"))
     base_salary = Column(Float)
-    # optional position-specific multiplier on top of base salary (default 1.0)
     salary_multiplier = Column(Float, default=1.0)
     pay_grade = Column(String)
     employment_type = Column(String)

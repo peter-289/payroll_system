@@ -5,7 +5,7 @@ from datetime import datetime
 
 class DepartmentBase(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str
     manager_id: Optional[int] = None
     location: Optional[str] = None
     salary_multiplier: Optional[float] = 1.0
@@ -23,8 +23,9 @@ class DepartmentUpdate(BaseModel):
     salary_multiplier: Optional[float]
 
 
-class DepartmentResponse(DepartmentBase):
-    department_id: int
+class DepartmentResponse(BaseModel):
+    id: int
+    name:str
     created_at: datetime
     updated_at: datetime
 
