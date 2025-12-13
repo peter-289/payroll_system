@@ -6,7 +6,6 @@ from decimal import Decimal
 
 class AllowanceTypeBase(BaseModel):
     name: str
-    code: str
     description: Optional[str] = None
     is_taxable: Optional[bool] = True
     is_recurring: Optional[bool] = True
@@ -23,6 +22,8 @@ class AllowanceTypeCreate(AllowanceTypeBase):
 
 class AllowanceTypeResponse(AllowanceTypeBase):
     id: int
+    code: str
+    is_active: str
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     
@@ -32,10 +33,11 @@ class AllowanceTypeResponse(AllowanceTypeBase):
 
 class AllowanceBase(BaseModel):
     payroll_id: int
-    name: str
+    allowance_type_id: int
     amount: Decimal = Field(..., decimal_places=2)
-    is_taxable: Optional[bool] = True
-
+    description: Optional[str] = None
+    calculation_basis: Optional[str] = None  # e.g., "fixed", "percentage"
+    Reference_number: Optional[str] = None
 
 class AllowanceCreate(AllowanceBase):
     pass
@@ -43,6 +45,9 @@ class AllowanceCreate(AllowanceBase):
 
 class AllowanceResponse(AllowanceBase):
     id: int
+    name: str
+    code: str
+    status:str
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     

@@ -37,7 +37,7 @@ def check_bounds(cls, v, values):
 class TaxBase(BaseModel):
     name: str
     description: str
-    type: TaxType
+    tax_type: TaxType
     #fixed_amount: Optional[float] = None
     effective_date:date
     expiry_date: Optional[date] = None
@@ -50,12 +50,10 @@ class TaxCreate(TaxBase):
 
 class TaxResponse(TaxBase):
     id: int
-    created_at: Optional[date]
-    updated_at: Optional[date]
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
     effective_date: datetime
     expiry_date: Optional[datetime]
-    created_at: datetime
-    updated_at: datetime
     brackets: List[TaxBracketResponse]
 
     class Config:

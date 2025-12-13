@@ -11,6 +11,8 @@ from backend.routes.tax_routes import router as tax_router
 from backend.routes.user_routes import router as user_router
 from backend.routes.auth_routes import router as auth_router
 from backend.routes.attendance_routes import router as attendance_router
+from backend.routes.allowance_type_routes import router as allowance_type_router
+from backend.routes.insuarance_routes import router as insurance_router
 from backend.routes.allowance_routes import router as allowance_router
 #from backend.routes.payroll_routes import router as payroll_router
 #from backend.routes.deduction_routes import router as deduction_router
@@ -75,6 +77,8 @@ app.include_router(user_router)
 app.include_router(attendance_router)
 app.include_router(department_router)
 app.include_router(tax_router)
+app.include_router(allowance_type_router)
+app.include_router(insurance_router)
 app.include_router(allowance_router)
 #app.include_router(employee_router)
 #app.include_router(payroll_router)

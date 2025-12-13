@@ -31,20 +31,14 @@ class AllowanceType(Base):
     code = Column(String(20), unique=True, nullable=False, index=True)  # e.g., "HOUS", "TRANS", "MEAL"
     name = Column(String(100), unique=True, nullable=False)  # e.g., "Housing Allowance"
     description = Column(Text, nullable=True)
-    
-    # === ALLOWANCE CHARACTERISTICS ===
     is_taxable = Column(Boolean, default=True)  # Whether included in taxable income
     is_recurring = Column(Boolean, default=True)  # Whether paid every period
     is_percentage_based = Column(Boolean, default=False)  # If true, calculated as % of salary
     percentage_of = Column(String(50), nullable=True)  # e.g., "basic_salary", "gross_salary"
-    
-    # === DEFAULT VALUES ===
     default_amount = Column(Numeric(12, 2), nullable=True)  # Suggested amount
     max_amount = Column(Numeric(12, 2), nullable=True)  # Maximum allowed per period
     min_amount = Column(Numeric(12, 2), nullable=True)  # Minimum allowed per period
-    
-    # === STATUS & AUDIT ===
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Enum(AllowanceStatus), nullable=False, default=AllowanceStatus.ACTIVE)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -73,22 +67,14 @@ class Allowance(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     payroll_id = Column(Integer, ForeignKey("payrolls.id", ondelete="CASCADE"), nullable=False, index=True)
     allowance_type_id = Column(Integer, ForeignKey("allowance_types.id", ondelete="RESTRICT"), nullable=False)
-    
-    # === ALLOWANCE DETAILS ===
     name = Column(String(100), nullable=False)  # Copy of allowance_type name for historical accuracy
     code = Column(String(20), nullable=False)  # Copy of allowance_type code
     amount = Column(Numeric(12, 2), nullable=False)  # Actual amount for this payroll
     description = Column(Text, nullable=True)
-    
-    # === CALCULATION INFO ===
     is_taxable = Column(Boolean, default=True)  # Whether taxable (cached from type)
     calculation_basis = Column(String(255), nullable=True)  # e.g., "50% of basic", "Fixed amount"
-    
-    # === STATUS & TRACKING ===
     status = Column(Enum(AllowanceStatus), nullable=False, default=AllowanceStatus.ACTIVE)
     reference_number = Column(String(100), nullable=True)  # External reference if applicable
-    
-    # === TIMESTAMPS ===
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
