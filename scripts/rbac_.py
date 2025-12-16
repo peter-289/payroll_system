@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
-from backend.models.roles_model import Role
-from backend.models.permissions_model import Permissions
-from backend.models.role_permission import RolePermission
-from backend.models.department_model import Department
-from backend.models.Position_model import Position
+from app.models.roles_model import Role
+from app.models.permissions_model import Permissions
+from app.models.role_permission import RolePermission
+from app.models.department_model import Department
+from app.models.Position_model import Position
 from fastapi import HTTPException, status
 
 

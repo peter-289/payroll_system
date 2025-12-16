@@ -19,8 +19,9 @@ data = {
     "account_type": "Checking"
 }
 
+URL = "http://localhost:8000/user/create_employee" 
 
-response = requests.post("http://localhost:8000/admin/create_employee", json=data)
+response = requests.post(URL, json=data)
 if response.status_code == 200 or response.status_code == 201:
     print("Employee created successfully:", response.json())
 else:
