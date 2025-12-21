@@ -24,7 +24,7 @@ class AllowanceType(Base):
     
     __table_args__ = (
         Index('ix_allowance_code', 'code'),
-        Index('ix_allowance_status', 'is_active'),
+        Index('ix_allowancetype_is_active', 'is_active'),
     )
     
     id = Column(Integer, primary_key=True, autoincrement=True)

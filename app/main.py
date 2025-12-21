@@ -14,6 +14,11 @@ from app.api.attendance_routes import router as attendance_router
 from app.api.allowance_type_routes import router as allowance_type_router
 from app.api.insuarance_routes import router as insurance_router
 from app.api.allowance_routes import router as allowance_router
+from app.api.payroll_routes import router as payroll_router
+from app.api.salary_routes import router as salary_router
+from app.api.deduction_routes import router as deduction_router
+from app.api.pension_routes import router as pension_router
+from app.api.loan_routes import router as loan_router
 #from backend.routes.payroll_routes import router as payroll_router
 #from backend.routes.deduction_routes import router as deduction_router
 #from backend.routes.employee_routes import router as employee_router
@@ -42,13 +47,17 @@ async def read_root():
         "documentation": "/docs",
         "endpoints": {
             "employees": "/employees",
-            "payroll": "/payrolls",
+            "payroll_compute_by_employee": "/api/v1/employees/{id}/payrolls/compute",
+            "payroll_compute": "/api/v1/payrolls/compute",
             "deductions": "/deductions",
             "allowances": "/allowances",
             "taxes": "/taxes",
             "departments": "/departments",
             "users": "/users",
-            "auth": "/auth"
+            "auth": "/auth",
+            "salaries": "/employees/{id}/salary",
+            "pensions": "/pensions",
+            "loans": "/loans"
         }
     }
 
@@ -81,5 +90,8 @@ app.include_router(allowance_type_router)
 app.include_router(insurance_router)
 app.include_router(allowance_router)
 #app.include_router(employee_router)
-#app.include_router(payroll_router)
-#app.include_router(deduction_router)
+app.include_router(deduction_router)
+app.include_router(salary_router)
+app.include_router(pension_router)
+app.include_router(loan_router)
+app.include_router(payroll_router)

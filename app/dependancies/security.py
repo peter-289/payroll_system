@@ -1,6 +1,6 @@
 """Security helpers for authentication, authorization and password management."""
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional, List
 import hashlib
 import os
@@ -76,7 +76,6 @@ def get_current_employee(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: int = payload.get("sub")
-        employee_id: int = payload.get("employee_id")
         role: str = payload.get("role")
         if user_id is None:
             raise credentials_exception
@@ -85,7 +84,7 @@ def get_current_employee(
         raise credentials_exception
 
     return {
-        "employee_id": employee_id, "user_id": user_id,"role":role
+         "user_id": user_id,"role":role
     }
 
 
@@ -120,10 +119,27 @@ def hr_access(
     return current_employee
 
 
+def admin_hr_or_self(
+    current_employee: dict = Depends(get_current_employee)
+):
+    """Allow access if current user is admin, hr, or the employee themself."""
+    role = current_employee.get("role")
+    if role in ("admin", "hr", "employee"):
+        return current_employee
+    
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Admin/HR or owner access required"
+    )
+
+
 #======================================================================================================
 #------------------------ PARSE DATE FROM DIFFERENT FORMATS ---------------------------------------------
-def parse_date(date:str):
-    raw = date.strip()
+def parse_date(value):
+    if isinstance(value, date):
+        return value
+    elif isinstance(value, str):
+        raw = value.strip()
 
     patterns = [
         "%Y-%m-%d",   # 2000-01-31  ← ISO (recommended)

@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from app.schemas.allowance_schema import AllowanceCreate
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -9,6 +8,7 @@ from app.services.insuarance_service import InsuranceService
 from app.models.allowances_model import AllowanceStatus
 import random
 from decimal import Decimal, InvalidOperation
+from app.exceptions.exceptions import AllowanceServiceError, AllowanceRecordNotFoundError, AllowanceTypeNotFoundError
 
 
 class AllowanceService:
@@ -27,10 +27,7 @@ class AllowanceService:
             allowance_type_id=allowance_type_id
         ).first()
         if existing_allowance:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Allowance of type ID {allowance_type_id} already exists for payroll ID {payroll_id}."
-            )
+            raise AllowanceServiceError(f"Allowance of type ID {allowance_type_id} already exists for payroll ID {payroll_id}.")
         return None
     
     def _validate_allowance_input(self, payload, allowance_type):
@@ -40,45 +37,27 @@ class AllowanceService:
           try:
             amount = Decimal(payload.amount)
           except (InvalidOperation, TypeError):
-            raise HTTPException(
-                status_code=400,
-                detail="Amount must be a valid decimal number."
-            )
+            raise AllowanceServiceError("Amount must be a valid decimal number.")
 
         # 2. Amount must be non-negative
           if amount < 0:
-            raise HTTPException(
-                status_code=400,
-                detail="Amount cannot be negative."
-            )
+            raise AllowanceServiceError("Amount cannot be negative.")
 
         # 3. Enforce min/max limits if defined
           if allowance_type.min_amount is not None and amount < allowance_type.min_amount:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Amount must be >= minimum {allowance_type.min_amount}."
-            )
+            raise AllowanceServiceError(f"Amount must be >= minimum {allowance_type.min_amount}.")
 
           if allowance_type.max_amount is not None and amount > allowance_type.max_amount:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Amount must be <= maximum {allowance_type.max_amount}."
-            )
+            raise AllowanceServiceError(f"Amount must be <= maximum {allowance_type.max_amount}.")
 
         # 4. Percentage-based allowances must have a basis
           if allowance_type.is_percentage_based:
             if not payload.calculation_basis:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Percentage-based allowances must specify calculation_basis."
-                )
+                raise AllowanceServiceError("Percentage-based allowances must specify calculation_basis.")
 
         # 5. Fixed allowances should not send percentage basis unless necessary
           if not allowance_type.is_percentage_based and payload.calculation_basis:
-            raise HTTPException(
-                status_code=400,
-                detail="calculation_basis should only be used for percentage-based allowances."
-            )
+            raise AllowanceServiceError("calculation_basis should only be used for percentage-based allowances.")
           return True
     
     def create_allowance(self, payload:AllowanceCreate):
@@ -107,7 +86,7 @@ class AllowanceService:
             self.db.refresh(new_allowance)
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create new allowance{e}")
+            raise AllowanceServiceError(f"Failed to create new allowance: {e}")
 
         return new_allowance
         
@@ -119,17 +98,17 @@ class AllowanceService:
     def get_allowance(self, allowance_id:int):
         allowance = self.db.get(Allowance, allowance_id)
         if not allowance:
-            raise HTTPException(status_code=404, detail=f"No allowance with id:{allowance_id} not found!")
+            raise AllowanceRecordNotFoundError(f"Allowance with id {allowance_id} not found!")
         return allowance
     
     def delete_allowance(self, allowance_id:int):
         allowance = self.db.get(Allowance, allowance_id)
         if not allowance:
-            raise HTTPException(status_code=404, detail=f"Allowance with id {allowance_id} could not be found!")
+            raise AllowanceRecordNotFoundError(f"Allowance with id {allowance_id} not found!")
         try:
             self.db.delete(allowance)
             self.db.commit()
             return {"message":f"Allowance with id:{allowance_id} deleted successfuly!"}
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Could not delete allowance:{e}")
+            raise AllowanceServiceError(f"Could not delete allowance: {e}")

@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from app.schemas.insurance_schema import InsuranceCreate, InsuranceResponse
 from app.models.Insuarance_model import Insurance
-from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from app.exceptions.exceptions import InsuranceServiceError, InsuranceRecordNotFoundError
 
 
 
@@ -25,10 +25,7 @@ class InsuranceService:
         ).first()
         
         if existing:
-            raise HTTPException(
-                status_code=400,
-                detail="Policy number already exists!"
-            )
+            raise InsuranceServiceError("Policy number already exists!")
 
         insurance_id = Insurance(
             employee_id=data.employee_id,
@@ -48,14 +45,14 @@ class InsuranceService:
             self.db.refresh(insurance_id)
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise HTTPException(status_code=500, detail=f"Could not create an insuarance:{e}!")
+            raise InsuranceServiceError(f"Could not create an insurance: {e}")
            
         return insurance_id
     
     def get_policy(self, insurance_id:int):
         policy = self.db.query(Insurance).filter(Insurance.id == insurance_id).first()
         if not policy:
-            raise HTTPException(status_code=404, detail=f"Could not find policy with id:{insurance_id}!")
+            raise InsuranceRecordNotFoundError(f"Could not find policy with id: {insurance_id}")
         return policy
     
     def get_all_policies(self):
@@ -65,26 +62,26 @@ class InsuranceService:
        policy = self.db.get(Insurance, insurance_id)
 
        if not policy:
-           raise HTTPException(status_code=404, detail="Policy not found!")
+           raise InsuranceRecordNotFoundError("Policy not found!")
        try:
             policy.status = "cancelled"
             policy.end_date = datetime.utcnow()
             self.db.commit()
        except SQLAlchemyError as e:
             self.db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Policy could not be cancelled!")
+            raise InsuranceServiceError("Policy could not be cancelled!")
        return {"message": "Policy cancelled successfully"}
 
     def delete_policy(self, insurance_id:int):
         policy = self.db.query(Insurance).filter(Insurance.id == insurance_id).first()
         if not policy:
-            raise HTTPException(status_code=404, detail=f"Policy with id:{insurance_id} not found!")
+            raise InsuranceRecordNotFoundError(f"Policy with id {insurance_id} not found!")
         try:
             self.db.delete(policy)
             self.db.commit()
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Could not delete policy!")
+            raise InsuranceServiceError(f"Could not delete policy!")
         return {"message":f"Policy with id {insurance_id} deleted successfuly!"}
 
     

@@ -1,21 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Form
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from typing import Optional
 from app.db.database_setup import get_db
-from app.dependancies.security import  admin_access, hash_password, parse_date, create_temporary_password
-from app.models.user_model import User
-from app.models.employee_model import Employee
-from app.models.roles_model import Role
-from app.models.Position_model import Position
-from app.models.department_model import Department
-from app.models.employee_bank_account import EmployeeBankAccount
-from app.models.employee_contacts_details import EmployeeContact
-from app.schemas.employee_schema import EmployeeCreate, EmployeeResponse as EmployeeCreateSchema, EmployeeResponse as EmployeeResponseSchema
-from sqlalchemy.orm import joinedload
-
+from app.schemas.employee_schema import EmployeeCreate, EmployeeResponse, EmployeeCreateResponse, EmployeeUpdate
+from app.services.user_service import (
+    EmployeeService,
+)
+from app.exceptions.exceptions import (
+    EmployeeServiceError,
+    UserAlreadyExistsError,
+    RoleNotFoundError,
+    DepartmentNotFoundError,
+    PositionNotFoundError,
+    ContactAlreadyExistsError,
+    BankAccountAlreadyExistsError,
+    EmployeeNotFoundError,
+)
 
 
 router = APIRouter(
-    prefix="/user", tags=["Employees"],
+    prefix="/api/v1", tags=["Employees"],
     #dependencies=[Depends(admin_access)]
 )
 
@@ -23,115 +27,84 @@ router = APIRouter(
 #======================================================================================================
 #----------------------------- CREATE EMPLOYEE ------------------------------------------------------
 #======================================================================================================
-@router.post("/create_employee", status_code=status.HTTP_201_CREATED)
-def create_employee(
-    employee: EmployeeCreateSchema,
-    db: Session = Depends(get_db),
-):
-    form = employee.dict()
-    
-    existing_user = db.query(User).filter(User.username == form["username"]).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username or email already exists")
-    role = db.query(Role).filter(Role.role_name == form["role_name"]).first()
-    if not role:
-        raise HTTPException(status_code=400, detail="Role does not exist")
-    pass_ = create_temporary_password()
-    hashed_password = hash_password(pass_)
+@router.post("/employees", response_model=EmployeeCreateResponse, status_code=status.HTTP_201_CREATED)
+def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
     try:
-       new_user = User(
-            first_name=form["first_name"],
-            last_name=form["last_name"],
-            username=form["username"],
-            password_hash=hashed_password,
-            role_id=role.id
-     )
-       db.add(new_user)
-       db.flush()
-       
-    
-       # Find department by name
-       department = db.query(Department).filter(Department.name == form["department_name"]).first()
-       if not department:
-           raise HTTPException(status_code=400, detail=f"Department '{form['department_name']}' does not exist")
-       
-       # Find position by title in the selected department
-       position = db.query(Position).filter(
-           Position.title == form["position_title"],
-           Position.department_id == department.id
-       ).first()
-       if not position:
-           raise HTTPException(
-               status_code=400, 
-               detail=f"Position '{form['position_title']}' does not exist in department '{form['department_name']}'"
-           )
-       
-       date_of_birth = parse_date(form["date_of_birth"])
-       new_employee = Employee(
-           user_id=new_user.id,
-           first_name=form["first_name"],
-           last_name=form["last_name"],
-           date_of_birth=date_of_birth,
-           employment_status="Active",
-           salary_type="Monthly",
-           department_id=department.id,
-           position_id=position.id
-        )
+        employee_service = EmployeeService(db)
+        result = employee_service.create_employee(employee)
+        return result
+    except UserAlreadyExistsError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists")
+    except (RoleNotFoundError, DepartmentNotFoundError, PositionNotFoundError):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role, department, or position")
+    except (ContactAlreadyExistsError, BankAccountAlreadyExistsError):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Contact or bank account already exists")
+    except EmployeeServiceError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create employee")
 
-       db.add(new_employee)
-       db.flush()
-       
-        
-       existing_contact = db.query(EmployeeContact).filter(EmployeeContact.phone == form["phone_number"]).first()
-       if existing_contact:
-            raise HTTPException(status_code=400, detail="Phone number already exists")
-       contact_details = EmployeeContact(
-           employee_id=new_employee.id,
-           email=form["email"],
-           phone=form["phone_number"],
-           address=form["address"],
-           city=form["city"],
-           country=form["country"]
-       )
-       db.add(contact_details)
-       
-       existing_bank_account = db.query(EmployeeBankAccount).filter(EmployeeBankAccount.account_number == form["account_number"]).first()
-       if existing_bank_account:
-            raise HTTPException(status_code=400, detail="Bank account number already exists")
-       bank_account = EmployeeBankAccount(
-           employee_id=new_employee.id,
-           bank_name=form["bank_name"],
-           account_number=form["account_number"],
-           account_type=form["account_type"]
-       )
-       db.add(bank_account)
-    
-       db.commit()
-       db.refresh(new_employee)
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to create employee: {e}" )
-    
-    return {"message": "Employee created successfully", "user_id": new_user.id
-            , "temporary_password": pass_}
+#======================================================================================================
+#----------------------------- GET EMPLOYEE BY ID ---------------------------------------------------
+#======================================================================================================
+@router.get("/employees/{employee_id}", response_model=EmployeeResponse, status_code=status.HTTP_200_OK)
+def get_employee_by_id(employee_id: int, db: Session = Depends(get_db)):
+    if employee_id <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Employee ID must be positive")
+    try:
+        employee_service = EmployeeService(db)
+        employee = employee_service.get_employee_by_id(employee_id)
+        return employee
+    except EmployeeNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found")
+    except EmployeeServiceError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve employee")
 
+#======================================================================================================
+#----------------------------- GET ALL EMPLOYEES ---------------------------------------------------
+#======================================================================================================
+@router.get("/employees", response_model=list[EmployeeResponse], status_code=status.HTTP_200_OK)
+def get_all_employees(
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: Optional[int] = Query(10, ge=1, description="Number of records to return"),
+    db: Session = Depends(get_db)
+):
+    try:
+        employee_service = EmployeeService(db)
+        employees = employee_service.get_all_employees(skip=skip, limit=limit)
+        return employees
+    except EmployeeServiceError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve employees")
 
-#===================================================================================================
-#-------------------------GET EMPLOYEE BY ID -------------------------------------------------------
-@router.get("/employee/{employee_id}", response_model=EmployeeResponseSchema)
-def get_employee(employee_id:int, db:Session = Depends(get_db)):
-    employee = db.query(Employee).options(
-        joinedload(Employee.user)
-        .joinedload(User.role)
-    ).filter(Employee.id == employee_id).first()
-    if not employee:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"No such user with id: {employee_id} found!")
-    return employee
+#======================================================================================================
+#----------------------------- UPDATE EMPLOYEE ------------------------------------------------------
+#======================================================================================================
+@router.put("/employees/{employee_id}", response_model=EmployeeResponse, status_code=status.HTTP_200_OK)
+def update_employee(employee_id: int, employee_update: EmployeeUpdate, db: Session = Depends(get_db)):
+    if employee_id <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Employee ID must be positive")
+    if not employee_update.model_dump(exclude_unset=True):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No update data provided")
+    try:
+        employee_service = EmployeeService(db)
+        updated_employee = employee_service.update_employee(employee_id, employee_update.model_dump(exclude_unset=True))
+        return updated_employee
+    except EmployeeNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found")
+    except (RoleNotFoundError, DepartmentNotFoundError, PositionNotFoundError):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role, department, or position")
+    except EmployeeServiceError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update employee")
 
-
-#===================================================================================================
-#------------------------- GET ALL EMPLOYEES -------------------------------------------------------
-@router.get("/all-employees")
-def get_all_employees(db:Session = Depends(get_db)):
-    employees = db.query(Employee).all()
-    return employees
+#======================================================================================================
+#----------------------------- DELETE EMPLOYEE ------------------------------------------------------
+#======================================================================================================
+@router.delete("/employees/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+    if employee_id <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Employee ID must be positive")
+    try:
+        employee_service = EmployeeService(db)
+        employee_service.delete_employee(employee_id)
+    except EmployeeNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found")
+    except EmployeeServiceError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete employee")

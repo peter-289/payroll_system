@@ -1,4 +1,67 @@
 from pydantic import BaseModel, Field
+from datetime import date, datetime
+from typing import List, Optional
+
+
+class EarningItem(BaseModel):
+    code: str
+    amount: float
+    taxable: bool = True
+
+
+class DeductionItem(BaseModel):
+    code: str
+    amount: float
+
+
+class AllowanceItem(BaseModel):
+    code: str
+    amount: float
+
+
+class PayrollInput(BaseModel):
+    employee_id: int
+    period_start: date
+    period_end: date
+    earnings: List[EarningItem]
+    deductions: Optional[List[DeductionItem]] = []
+    allowances: Optional[List[AllowanceItem]] = []
+    config: Optional[dict] = None
+
+    model_config = {"from_attributes": True}
+
+
+class TaxBreakdownItem(BaseModel):
+    name: str
+    amount: float
+    rate: Optional[float] = None
+
+
+class LineItem(BaseModel):
+    code: str
+    description: Optional[str] = None
+    amount: float
+
+
+class PayrollResult(BaseModel):
+    employee_id: int
+    period_start: date
+    period_end: date
+    gross_pay: float
+    taxable_income: float
+    tax_total: float
+    tax_breakdown: List[TaxBreakdownItem]
+    deductions_total: float
+    allowances_total: float
+    net_pay: float
+    employer_costs: Optional[float] = 0.0
+    line_items: Optional[List[LineItem]] = []
+    audit: Optional[dict] = None
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    model_config = {"from_attributes": True}
+from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 from datetime import date, datetime
 from decimal import Decimal

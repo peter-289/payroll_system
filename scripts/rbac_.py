@@ -132,11 +132,11 @@ def seed_positions(db):
     }
 
     positions_data = [
-        {"title": "Software Engineer",  "base_salary": 80000, "department": departments["Engineering"]},
-        {"title": "QA Analyst", "base_salary": 65000, "department": departments["Engineering"]},
-        {"title": "HR Officer", "base_salary": 60000, "department": departments["HR"]},
-        {"title": "Accountant", "base_salary": 70000, "department": departments["Finance"]},
-        {"title": "Sales Representative",  "base_salary": 50000, "department": departments["Sales"]},
+        {"title": "Software Engineer",  "department": departments["Engineering"]},
+        {"title": "QA Analyst",  "department": departments["Engineering"]},
+        {"title": "HR Officer",  "department": departments["HR"]},
+        {"title": "Accountant",  "department": departments["Finance"]},
+        {"title": "Sales Representative",  "department": departments["Sales"]},
     ]
 
     for pos in positions_data:
@@ -144,7 +144,6 @@ def seed_positions(db):
         if not position:
             new_pos = Position(
                 title=pos["title"],
-                base_salary=pos["base_salary"],
                 department_id=pos["department"].id
             )
             db.add(new_pos)

@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.attendance_model import Attendance
 from app.models.employee_model import Employee
@@ -8,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pytz
 from app.db.database_setup import get_db
 from datetime import date
+from app.exceptions.exceptions import AttendanceServiceError, AttendanceRecordNotFoundError
 
 EAT = pytz.timezone("Africa/Nairobi")
 
@@ -19,10 +19,7 @@ def get_date(target_date: date) -> date:
 
 def validate_date(target_date: date) -> None:
         if target_date > datetime.now(EAT).date():
-            raise HTTPException(
-                status_code=400,
-                detail="Cannot check in for a future date"
-            )
+            raise AttendanceServiceError("Cannot check in for a future date")
         
 def check_existing_attendance(db: Session, employee_id: int, target_date: date) -> Attendance:
         existing_attendance = db.query(Attendance).filter(
@@ -30,10 +27,7 @@ def check_existing_attendance(db: Session, employee_id: int, target_date: date) 
             Attendance.attendance_date == target_date
         ).first()
         if existing_attendance:
-            raise HTTPException(
-                status_code=400,
-                detail="Attendance for this date already recorded"
-            )
+            raise AttendanceServiceError("Attendance for this date already recorded")
         return existing_attendance
 
 def create_attendance_record(
@@ -63,10 +57,7 @@ def create_attendance_record(
             db.refresh(attendance)
         except SQLAlchemyError as e:
             db.rollback()
-            raise HTTPException(
-                status_code=500,
-                detail=f"Database error occurred while creating attendance record: {str(e)}"
-            ) 
+            raise AttendanceServiceError(f"Database error occurred while creating attendance record: {str(e)}")
         return attendance
 
 def calculate_hours_worked(check_in: datetime, check_out: datetime) -> float:

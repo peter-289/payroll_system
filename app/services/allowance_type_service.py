@@ -1,9 +1,9 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.models.allowances_model import Allowance, AllowanceType
 from app.schemas.allowance_schema import AllowanceCreate, AllowanceTypeCreate
 from sqlalchemy.exc import SQLAlchemyError
 import random
+from app.exceptions.exceptions import AllowanceServiceError, AllowanceTypeNotFoundError
 
 
 class AllowanceTypeService:
@@ -27,7 +27,7 @@ class AllowanceTypeService:
         code = self._generate_code(payload)
         existing_type = self.db.query(AllowanceType).filter(AllowanceType.code == code).first()
         if existing_type:
-            raise HTTPException(status_code=400, detail="Allowance type with this code already exists!")
+            raise AllowanceServiceError("Allowance type with this code already exists!")
         
         new_allowance_type = AllowanceType(
                name=payload.name,
@@ -47,7 +47,7 @@ class AllowanceTypeService:
             self.db.refresh(new_allowance_type)
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create new allowance type{e}")
+            raise AllowanceServiceError(f"Failed to create new allowance type: {e}")
         return new_allowance_type
     
     def get_allowance_types(self):
@@ -57,17 +57,17 @@ class AllowanceTypeService:
     def get_allowance_type(self, type_id:int):
         allowance_type = self.db.get(AllowanceType, type_id)
         if not allowance_type:
-            raise HTTPException(status_code=404, detail=f"No allowance type with id:{type_id} not found!")
+            raise AllowanceTypeNotFoundError(f"Allowance type with id {type_id} not found!")
         return allowance_type
     
     def delete_allowance_type(self, type_id:int):
         allowance_type = self.db.get(AllowanceType, type_id)
         if not allowance_type:
-            raise HTTPException(status_code=404, detail=f"Allowance type with id {type_id} could not be found!")
+            raise AllowanceTypeNotFoundError(f"Allowance type with id {type_id} not found!")
         try:
             self.db.delete(allowance_type)
             self.db.commit()
             return {"message":f"Allowance type with id:{type_id} deleted successfuly!"}
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Could not delete allowance type:{e}")
+            raise AllowanceServiceError(f"Could not delete allowance type: {e}")

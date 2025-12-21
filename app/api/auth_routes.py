@@ -1,19 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
-from app.dependancies.security import get_current_employee, verify_password, hash_password, parse_date, create_login_token
-from app.models.user_model import User
-from app.models.roles_model import Role
-from app.models.employee_model import Employee as Empl
+from app.services.auth_service import AuthService
+from app.exceptions.exceptions import AuthServiceError, InvalidCredentialsError, UserNotFoundError
 from fastapi.security import OAuth2PasswordRequestForm
 
 
 router = APIRouter(
     prefix="/auth",tags=["Authentication"]
 )
-#--------------------------------------------------------------------------------------------------
-#             --------------- LOGIN ROUTE --------------------
-#--------------------------------------------------------------------------------------------------
+
+#================================================================================================================
+#-------------------------- LOGIN ROUTE -------------------------------------------------------------------------
+#================================================================================================================
 @router.post("/login", status_code=status.HTTP_200_OK)
 def login(
     form_data:OAuth2PasswordRequestForm = Depends(),
@@ -21,48 +20,38 @@ def login(
     username = form_data.username
     password = form_data.password
     """Authenticate user and return a login token."""
-    user = db.query(User).filter(User.username == username).first()
-    if not user or not verify_password(password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
-    role = db.query(Role).filter(Role.id == user.role_id).first()
-    if not role:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User role not found")
-    employee = db.query(Empl).filter(Empl.user_id == user.id).first()
-    if not employee:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Employee record not found")
-    token_data = {
-        "sub": str(user.id),
-        "employee_id": str(employee.id),
-        "role": role.role_name
-        }
-    access_token = create_login_token(data=token_data)
-    if user.must_change_password:
-        return{
-            "detail":"Password change required!",
-            "change required":True, 
-            "user_id":user.id
-        }    
-    return {"access_token": access_token, "token_type": "bearer", "user_id":user.id}
+    service = AuthService(db)
+    try:
+        result = service.authenticate_user(username, password)
+        if result.get("must_change_password"):
+            return {
+                "detail": "Password change required!",
+                "change required": True,
+                "user_id": result.get("user_id")
+            }
+        return {"access_token": result.get("access_token"), "token_type": "bearer", "user_id": result.get("user_id")}
+    except InvalidCredentialsError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+    except AuthServiceError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-
-
-#---------------------------------------------------------------------------------------------------------
-#              ------------ CHANGE PASSWORD FOR FIRST TIMERS -----------------
-#---------------------------------------------------------------------------------------------------------
-@router.post("/change-password")
+#================================================================================================================
+#----------------------- CHANGE PASSWORD ------------------------------------------------------------------------
+#================================================================================================================
+@router.post("/password")
 def change_password(
-    user_id:int = Form(...),
+    user_id:str = Form(...),
     new_password:str = Form(...),
     db:Session = Depends(get_db)
     
 ):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found!")
-    
-    hashed = hash_password(new_password)
-    user.password_hash = hashed
-    user.must_change_password = False
-    db.commit()
+    service = AuthService(db)
+    try:
+        return service.change_password(user_id, new_password)
+    except UserNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except AuthServiceError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-    return {"message":"Password changed successfully. You can now login!"}
+
+

@@ -12,6 +12,7 @@ from app.dependancies.security import get_current_employee
 from app.schemas.attendance_schema import AttendanceResponse, CheckInOutRequest
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, func
+from app.exceptions.exceptions import AttendanceServiceError, AttendanceRecordNotFoundError
 #from backend.dependancies.security import get_current_admin
   # your auth dependency
 
@@ -36,6 +37,11 @@ def check_in_or_out(
                 current_employee.id
             )
             
+        except AttendanceServiceError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
         except SQLAlchemyError as e:
             db.rollback()
             raise HTTPException(

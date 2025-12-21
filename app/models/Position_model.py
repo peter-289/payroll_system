@@ -11,9 +11,9 @@ class Position(Base):
     title = Column(String)
     department_id = Column(Integer, ForeignKey("departments.id"))
     role_id = Column(Integer, ForeignKey("roles.id"))
-    base_salary = Column(Float)
+    #base_salary = Column(Float)
     salary_multiplier = Column(Float, default=1.0)
-    pay_grade = Column(String)
+    #pay_grade = Column(String)
     employment_type = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -24,3 +24,5 @@ class Position(Base):
     employees = relationship("Employee", back_populates="position")
     # single role associated with this position
     role = relationship("Role", back_populates="positions")
+    # salaries associated with this position
+    salaries = relationship("PositionSalary", back_populates="position")
