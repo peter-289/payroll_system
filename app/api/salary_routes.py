@@ -33,7 +33,6 @@ def get_effective_salary(employee_id: int, target_date: date = date.today(), db:
     except SalaryServiceError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-
 @router.post("/employees/{employee_id}/salary", status_code=201)
 def add_employee_salary(employee_id: int, amount: float, salary_type: PayFrequency = PayFrequency.MONTHLY, db: Session = Depends(get_db), created_by: int | None = None):
     try:

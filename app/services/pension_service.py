@@ -32,6 +32,15 @@ class PensionService:
         if not p:
             raise PensionNotFoundError(f"Pension with id {pension_id} not found")
         return p
+    
+    def get_employee_pension(self, employee_id:int):
+        if employee_id<=0:
+            raise PensionServiceError("Invalid ID")
+        pension = self.db.query(Pension).filter(Pension.employee_id == employee_id).first()
+        if not pension:
+            raise PensionNotFoundError(f"Pension with employee id: {employee_id} not found.")
+        return pension
+
 
     def list_pensions(self, skip: int = 0, limit: int = 100):
         return self.db.query(Pension).offset(skip).limit(limit).all()

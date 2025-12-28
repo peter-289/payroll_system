@@ -7,6 +7,8 @@ from app.services.payroll_engine import PayrollEngine
 from app.services.user_service import EmployeeService
 from app.exceptions.exceptions import EmployeeNotFoundError, PayrollEngineError
 from app.dependancies.security import get_current_employee, admin_hr_or_self
+from app.schemas.payroll_schema import PayrollRunRequest, PayrollRunResponse
+from app.exceptions.exceptions import PayrollRunError
 
 router = APIRouter(prefix="/api/v1", tags=["Payrolls"])
 
@@ -72,3 +74,23 @@ def compute_payroll(payload: PayrollInput, db: Session = Depends(get_db), curren
         return result
     except PayrollEngineError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+# --- Lightweight run endpoint that persists a Payroll record via PayrollService ---
+"""@router.post("/payroll/run", response_model=PayrollRunResponse)
+def run_payroll(payload: PayrollRunRequest, db: Session = Depends(get_db)):
+    try:
+        service = PayrollService(db)
+        payroll = service.run(
+            employee_id=payload.employee_id,
+            pay_period_start=payload.pay_period_start,
+            pay_period_end=payload.pay_period_end,
+            worked_days=payload.worked_days,
+            overtime_hours=payload.overtime_hours,
+        )
+        return payroll
+    except PayrollRunError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+"""

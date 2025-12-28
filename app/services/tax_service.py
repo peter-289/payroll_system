@@ -78,6 +78,10 @@ class TaxService:
             raise TaxRuleNotFoundError(f"Tax rule with ID {tax_id} not found")
         return tax_rule
     
+    def get_fixed_tax_rules(self, tax_id:int):
+        fixed_taxes = self.db.query(Tax).filter(Tax.tax_type == TaxType.FIXED, Tax.id == tax_id).first()
+        return fixed_taxes
+    
     def update_tax_rule(self, tax_id:int, payload:TaxCreate):
         tax_rule = self.get_tax_rule(tax_id)
     

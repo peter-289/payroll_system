@@ -55,6 +55,14 @@ class InsuranceService:
             raise InsuranceRecordNotFoundError(f"Could not find policy with id: {insurance_id}")
         return policy
     
+    def get_employee_policy(self, employee_id:int):
+        if  employee_id <=0:
+            raise InsuranceServiceError(f"Invalid ID: { employee_id}")
+        policy = self.db.query(Insurance).filter(Insurance.employee_id == employee_id).first()
+        if not policy:
+            raise InsuranceRecordNotFoundError(f"Could not find policy with employee id: {employee_id}")
+        return policy
+    
     def get_all_policies(self):
         return self.db.query(Insurance).all()
     

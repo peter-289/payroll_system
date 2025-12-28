@@ -35,6 +35,14 @@ class LoanService:
         if not l:
             raise LoanNotFoundError(f"Loan with id {loan_id} not found")
         return l
+    
+    def get_employee_loan(self, employee_id:int):
+        if employee_id <=0:
+            raise LoanServiceError("Invalid id")
+        loan = self.db.query(Loan).filter(Loan.employee_id == employee_id).first()
+        if not loan:
+            raise LoanNotFoundError(f"Loan with employee id: {employee_id} not found")
+        return loan
 
     def list_loans(self, skip:int=0, limit:int=100):
         return self.db.query(Loan).offset(skip).limit(limit).all()

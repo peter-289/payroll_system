@@ -1,24 +1,29 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
 
 
 class DeductionBase(BaseModel):
     name: str
-    type: str
-    amount: Decimal = Field(..., decimal_places=2)
-    description: Optional[str] = None
-    payroll_id: Optional[int] = None
+    is_statutory: bool = Field(default=False)
+    is_taxable: bool = Field(default=False)
+    has_brackets: bool = Field(default=False)
 
+class DeductionBracket(BaseModel):
+    min_amount: Decimal
+    max_amount: Optional[Decimal] = None
+    rate: Decimal
+    fixed_amount: Optional[Decimal] = None
 
 class DeductionCreate(DeductionBase):
-    payroll_id: int
-
+    brackets: Optional[List[DeductionBracket]] = []  # List of DeductionBracket
 
 class DeductionResponse(DeductionBase):
-    deduction_id: int
-    created_at: datetime
+    id: int
+    code: str
+    created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True

@@ -144,6 +144,17 @@ class SalaryNotFoundError(SalaryServiceError):
     pass
 
 
+class InvalidPayFrequencyError(SalaryServiceError):
+    """Raised when an unsupported pay frequency is supplied to payroll engines"""
+    pass
+
+
+# Payroll run errors
+class PayrollRunError(Exception):
+    """Raised when a payroll run cannot be completed (business/domain level)."""
+    pass
+
+
 # Deduction related exceptions
 class DeductionServiceError(Exception):
     """Base exception for deduction service errors"""

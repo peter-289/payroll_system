@@ -3,6 +3,7 @@ from app.models.salary_model import EmployeeSalary, PositionSalary, PayFrequency
 from app.exceptions.exceptions import SalaryServiceError, SalaryNotFoundError
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, date
+from app.models.Position_model import Position
 
 
 class SalaryService:
@@ -10,6 +11,8 @@ class SalaryService:
         self.db = db
 
     def get_employee_salary(self, employee_id: int):
+        if employee_id <= 0:
+            raise SalaryServiceError("Invalid employee ID")
         try:
             salary = self.db.query(EmployeeSalary).filter(EmployeeSalary.employee_id == employee_id).order_by(EmployeeSalary.effective_from.desc()).first()
         except SQLAlchemyError as e:
@@ -19,6 +22,8 @@ class SalaryService:
         return salary
 
     def get_effective_employee_salary(self, employee_id: int, target_date: date):
+        if employee_id <= 0:
+            raise SalaryServiceError("Invalid employee ID")
         try:
             salary = self.db.query(EmployeeSalary).filter(
                 EmployeeSalary.employee_id == employee_id,
@@ -50,13 +55,35 @@ class SalaryService:
         return salary
 
     def get_position_salaries(self, position_id:int):
+        if position_id <= 0:
+            raise SalaryServiceError("Invalid position ID")
         try:
             result = self.db.query(PositionSalary).filter(PositionSalary.position_id == position_id).order_by(PositionSalary.effective_from).all()
         except SQLAlchemyError as e:
             raise SalaryServiceError(f"DB error fetching position salaries: {e}")
         return result
+    
+    def get_current_position_salary(self, position_id: int) -> PositionSalary | None:
+       if position_id <= 0:
+            raise SalaryServiceError("Invalid position ID")
+       try:
+            position_salary = self.db.query(PositionSalary).filter(
+                 PositionSalary.position_id == position_id,
+                 PositionSalary.effective_from <= date.today(),
+             ).filter(
+                 (PositionSalary.effective_to == None) | (PositionSalary.effective_to >= date.today())
+             ).order_by(PositionSalary.effective_from.desc()).first()
+       except SQLAlchemyError as e:
+           raise SalaryServiceError(f"DB error fetching current position salary: {e}")
+       return position_salary
+    
 
     def add_position_salary(self, position_id:int, amount:float, salary_type:PayFrequency = PayFrequency.MONTHLY, effective_from:datetime|None=None, created_by:int|None=None):
+        if position_id <= 0:
+            raise SalaryServiceError("Invalid position ID")
+        position = self.db.query(Position).filter(Position.id == position_id).first()
+        if not position:
+            raise SalaryServiceError(f"Position with ID {position_id} does not exist")
         effective_from = effective_from or datetime.utcnow()
         position_salary = PositionSalary(
             position_id=position_id,

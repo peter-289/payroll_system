@@ -37,46 +37,28 @@ class Payroll(Base):
     # --- Primary Keys & Relationships ---
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     employee_id = Column(Integer, ForeignKey("employees.id"), index=True, nullable=False)
-
-    # --- Pay Period ---
     pay_period_start = Column(Date, nullable=False, index=True)
     pay_period_end = Column(Date, nullable=False, index=True)
     payment_date = Column(Date, nullable=False)
-
-    # --- Earnings Breakdown (inputs live in separate tables) ---
     total_allowances = Column(Numeric(12, 2), nullable=False, default=Decimal("0.00"))
     total_deductions = Column(Numeric(12, 2), nullable=False, default=Decimal("0.00"))
     tax_amount = Column(Numeric(12, 2), nullable=False, default=Decimal("0.00"))
-
-    
-    # --- Final Results ---
     gross_salary = Column(Numeric(12, 2), nullable=False)
     net_salary = Column(Numeric(12, 2), nullable=False)
-
-    # --- Payment Info ---
     status = Column(Enum(PayrollStatus), nullable=False, default=PayrollStatus.DRAFT, index=True)
     payment_method = Column(Enum(PaymentMethod), nullable=True)
     bank_transaction_id = Column(String(100), nullable=True)
     bank_transaction_reference = Column(String(255), nullable=True)
-
-    # --- Timestamps ---
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     processed_at = Column(DateTime, nullable=True)
     paid_at = Column(DateTime, nullable=True)
-
-    # --- Versioning & Audit ---
     version = Column(Integer, nullable=False, default=1)
     is_amended = Column(Boolean, default=False)
     amendment_reason = Column(Text, nullable=True)
     amended_by = Column(Integer, ForeignKey("users.id"), nullable=True)
-
-    
-
-    # --- Misc ---
     notes = Column(Text, nullable=True)
-    processing_errors = Column(JSON, nullable=True)
-    
+
     # === RELATIONSHIPS ===
     employee = relationship("Employee", back_populates="payrolls")
     allowances = relationship("Allowance", back_populates="payroll", cascade="all, delete-orphan")

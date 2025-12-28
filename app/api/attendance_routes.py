@@ -3,8 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, date, time, timedelta
 import pytz
-from app.services.attendance_service import (
-    create_attendance_record)
+from app.services.attendance_service import AttendanceService
 from app.db.database_setup import get_db
 from app.models.attendance_model import Attendance
 from app.models.employee_model import Employee
@@ -31,12 +30,12 @@ def check_in_or_out(
     current_employee: Employee = Depends(get_current_employee)
 ):
         try:
-            create_attendance_record(
+            attendance = AttendanceService(db).create_attendance_record(
                 payload,
-                db,
                 current_employee.id
             )
-            
+            return attendance
+
         except AttendanceServiceError as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

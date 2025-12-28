@@ -8,64 +8,43 @@ from datetime import datetime
 from enum import Enum as PyEnum
 from decimal import Decimal
 
-class DeductionType(PyEnum):
-    """Types of deductions for tax compliance."""
-    STATUTORY = "statutory"  # Tax, NSSF, etc.
-    VOLUNTARY = "voluntary"  # Loans, insurance, union dues
-    DISCIPLINARY = "disciplinary"  # Penalties, advances
-    COURT_ORDER = "court_order"  # Garnishments
 
-class DeductionStatus(PyEnum):
-    """Status of deductions."""
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    SUSPENDED = "suspended"
-    CANCELLED = "cancelled"
+class DeductionType(Base):
+    __tablename__ = "deduction_types"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String(100), unique=True, nullable=False)     # "PAYE", "NHIF", "NSSF Employee"
+    code = Column(String(20), unique=True, nullable=False)      # "PAYE", "NHIF", "NSSF_EMP"
+    is_statutory = Column(Boolean, default=False)               # True for legal deductions
+    is_taxable = Column(Boolean, default=False)                 # Does it reduce taxable income?
+    has_brackets = Column(Boolean, default=False)  
+    created_at = Column(DateTime, default=datetime.utcnow())
+    updated_at = Column(DateTime, default=datetime.utcnow(), onupdate=datetime.utcnow())  # True for tiered (PAYE, NHIF)
+
+    deductions = relationship("Deduction", back_populates="deduction_type")
+    brackets = relationship("DeductionBracket", back_populates="deduction_type")
+
+
+class DeductionBracket(Base):
+    __tablename__ = "deduction_brackets"
+    id = Column(Integer, primary_key=True, index=True)
+    deduction_type_id = Column(Integer, ForeignKey("deduction_types.id"))
+    min_amount = Column(Numeric(14, 2))
+    max_amount = Column(Numeric(14, 2), nullable=True)
+    rate = Column(Numeric(5, 2))           # percentage
+    fixed_amount = Column(Numeric(14, 2), nullable=True)
+
+    deduction_type = relationship("DeductionType", back_populates="brackets")
+    
 
 class Deduction(Base):
-    """
-    Represents a deduction from employee payroll.
-    Supports recurring deductions, caps, and audit trails.
-    """
     __tablename__ = "deductions"
-    
-    __table_args__ = (
-        CheckConstraint('amount >= 0', name='check_deduction_amount_positive'),
-        CheckConstraint('max_amount IS NULL OR max_amount >= 0', name='check_max_deduction_positive'),
-        Index('ix_deduction_payroll_id', 'payroll_id'),
-        Index('ix_deduction_type_code', 'deduction_code'),
-        Index('ix_deduction_status', 'status'),
-    )
-    
-    # === PRIMARY & FOREIGN KEYS ===
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    payroll_id = Column(Integer, ForeignKey("payrolls.id", ondelete="CASCADE"), nullable=False, index=True)
-    
-    # === DEDUCTION DETAILS ===
-    deduction_code = Column(String(20), nullable=False, index=True)  # e.g., "NSSF", "TAX", "UNION"
-    name = Column(String(100), nullable=False)  # e.g., "National Social Security Fund"
-    description = Column(Text, nullable=True)
-    deduction_type = Column(Enum(DeductionType), nullable=False, default=DeductionType.STATUTORY)
-    
-    # === AMOUNT DETAILS ===
-    amount = Column(Numeric(12, 2), nullable=False)  # Amount deducted this period
-    max_amount = Column(Numeric(12, 2), nullable=True)  # Monthly/annual cap (optional)
-    
-    # === TRACKING & COMPLIANCE ===
-    reference_number = Column(String(100), nullable=True)  # e.g., Loan ID, court order number
-    status = Column(Enum(DeductionStatus), nullable=False, default=DeductionStatus.ACTIVE)
-    is_taxable = Column(Boolean, default=False)  # Whether deduction reduces taxable income
-    
-    # === RECURRING DEDUCTION INFO ===
-    is_recurring = Column(Boolean, default=False)
-    recurring_end_date = Column(Date, nullable=True)
-    
-    # === TIMESTAMPS & AUDIT ===
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # === RELATIONSHIPS ===
+
+    id = Column(Integer, primary_key=True, index=True)
+    payroll_id = Column(Integer, ForeignKey("payrolls.id"), nullable=False)
+    deduction_type_id = Column(Integer, ForeignKey("deduction_types.id"), nullable=False)
+    amount = Column(Numeric(14, 2), nullable=False)
+    is_percentage = Column(Boolean, default=False)
+
     payroll = relationship("Payroll", back_populates="deductions")
-    
-    def __repr__(self):
-        return f"<Deduction(id={self.id}, code={self.deduction_code}, amount={self.amount})>"
+    deduction_type = relationship("DeductionType", back_populates="deductions")

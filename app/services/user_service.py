@@ -181,6 +181,41 @@ class EmployeeService:
         if not employee:
             raise EmployeeNotFoundError(f"Employee with ID {employee_id} not found")
         return employee
+    
+    
+    def get_employee_position(self, employee_id:int)->Position:
+        if employee_id<=0:
+            raise EmployeeServiceError("Invalid ID")
+        employee = (
+            self.db.query(Employee)
+            .options(joinedload(Employee.position))
+            .filter(Employee.id == employee_id)
+            .first()
+        )
+        
+        if not employee:
+            raise EmployeeNotFoundError(f"Employee with id: {employee_id} not found")
+       
+        if not employee.position:
+            raise EmployeeServiceError(f"No position for employee: {employee_id} was found.")
+        return employee.position
+    
+    def get_employee_department(self, employee_id:int)->Department:
+        if employee_id<=0:
+            raise (" Invalid ID")
+        employee = (
+            self.db.query(Employee)
+            .options(joinedload(Employee.department))
+            .filter(Employee.id == employee_id)
+            .first()
+        )
+        if not employee:
+            raise EmployeeNotFoundError(f"Employee with id: {employee_id} not found.")
+        if not employee.department:
+            raise EmployeeServiceError(f"No departments associated with employee Id: {employee_id}")
+        return employee.department
+    
+    
 
     def get_all_employees(self, skip: int = 0, limit: Optional[int] = None) -> List[Employee]:
         """Retrieve all employees with optional pagination"""

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.initialize_db import init_db
-from scripts.rbac_ import seed_role_permissions, seed_roles, seed_permissions, seed_departments, seed_positions
+from scripts.seed_utility import seed_role_permissions,seed_salaries, seed_roles, seed_permissions, seed_departments, seed_positions
 from scripts.create_admin import seed_admin
 from app.db.database_setup import SessionLocal
 
@@ -77,6 +77,7 @@ async def startup_event():
     seed_role_permissions(db)
     seed_departments(db)
     seed_positions(db)
+    seed_salaries(db)
     db.close()
 
 

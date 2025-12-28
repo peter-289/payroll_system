@@ -35,6 +35,7 @@ class DepartmentService:
         positions = self.db.query(Position).filter(Position.department_id == department.id).all()
         return positions
     
+    
     def get_all_departments(self) -> List[Department]:
         """Get all departments."""
         departments = self.db.query(Department).all()

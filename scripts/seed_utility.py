@@ -5,7 +5,10 @@ from app.models.role_permission import RolePermission
 from app.models.department_model import Department
 from app.models.Position_model import Position
 from fastapi import HTTPException, status
-
+from app.db.database_setup import SessionLocal
+from app.services.salary_service_impl import SalaryService
+from app.models.salary_model import PositionSalary, PayFrequency
+from datetime import date
 
 
 # ---- Seed roles ---- #
@@ -121,7 +124,7 @@ def seed_departments(db: Session):
     db.close()
 
 # -----Seed positions---
-def seed_positions(db):
+def seed_positions(db: Session):
     departments = {
         "Engineering": db.query(Department).filter_by(name="Engineering").first(),
         "HR": db.query(Department).filter_by(name="Human Resources").first(),
@@ -147,8 +150,46 @@ def seed_positions(db):
                 department_id=pos["department"].id
             )
             db.add(new_pos)
-            print(f"👌Added position:{pos['title']}")
+            print(f"[OK]Added position:{pos['title']}")
         else:
-            print(f"😎Position already exists:{pos['title']}")
+            print(f"[OK]Position already exists:{pos['title']}")
     db.commit()
-    print("✅ Positions seeded successfully.")
+    print("[OK] Positions seeded successfully.")
+
+#========================================================================================
+# Seed salaries
+def seed_salaries(db: Session):
+    repo = SalaryService(db)
+    today = date.today()
+    salaries= [
+        {"position_id": 1, "amount": 8000.0, "salary_type": PayFrequency.MONTHLY},
+        {"position_id": 2, "amount": 6000.0, "salary_type": PayFrequency.MONTHLY},
+        {"position_id": 3, "amount": 5000.0, "salary_type": PayFrequency.MONTHLY},
+        {"position_id": 4, "amount": 7000.0, "salary_type": PayFrequency.MONTHLY},
+        {"position_id": 5, "amount": 4000.0, "salary_type": PayFrequency.MONTHLY},
+    ]
+    inserted_count = 0
+    skipped_count = 0
+    try:
+        for item in salaries:
+            existing = repo.get_position_salaries(item["position_id"])
+            if existing:
+                print(f"[*]Salary for position_id {item['position_id']} already exists. Skipping.")
+                skipped_count += 1
+                continue
+            else:
+                repo.add_position_salary(
+                    position_id=item["position_id"],
+                    amount=item["amount"],
+                    salary_type=item["salary_type"],
+                    effective_from=today,   
+                    created_by=1
+                )
+                print(f"[*]Added {inserted_count} ssalries and skipped {skipped_count} salaries.")
+                inserted_count += 1
+            
+
+    except Exception as e:
+        raise RuntimeError(f"[*]Failed to seed salaries: {e}") from e
+        
+        

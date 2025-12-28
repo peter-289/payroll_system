@@ -33,6 +33,17 @@ def list_deductions(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
     return service.list_deductions(skip, limit)
 
 
+@router.put('/deductions/{deduction_id}', response_model=DeductionResponse)
+def update_deduction(deduction_id:int, payload: DeductionCreate, db: Session = Depends(get_db)):
+    try:
+        service = DeductionService(db)
+        return service.update_deduction(deduction_id, payload)
+    except DeductionNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except DeductionServiceError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
 @router.delete('/deductions/{deduction_id}', status_code=204)
 def delete_deduction(deduction_id:int, db: Session = Depends(get_db)):
     try:
