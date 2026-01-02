@@ -1,50 +1,108 @@
-from dataclasses import dataclass
-from decimal import Decimal
-from datetime import date
-from app.repositories.employee_repository import EmployeeRepository
-from app.repositories.employee_salary_repository import EmployeeSalaryRepository
-from app.repositories.position_salary_repository import PositionSalaryRepository
-from app.exceptions.exceptions import SalaryNotFoundError, SalaryServiceError
-
-
-@dataclass
-class SalaryDTO:
-    amount: Decimal
-    currency: str
-    pay_frequency: str
+from sqlalchemy.orm import Session
+from app.models.salary_model import EmployeeSalary, PositionSalary, PayFrequency
+from app.exceptions.exceptions import SalaryServiceError, SalaryNotFoundError
+from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime, date
+from app.models.Position_model import Position
+from sqlalchemy.orm import joinedload
 
 
 class SalaryService:
-    """Service responsible for resolving the effective salary for an employee.
+    def __init__(self, db: Session):
+        self.db = db
 
-    - Uses repositories for DB access (no direct ORM queries here)
-    - Implements precedence logic: employee salary overrides position salary
-    - Returns a SalaryDTO (plain dataclass) suitable for engines
-    """
-
-    def __init__(self, db):
-        self.employee_repo = EmployeeRepository(db)
-        self.emp_salary_repo = EmployeeSalaryRepository(db)
-        self.pos_salary_repo = PositionSalaryRepository(db)
-
-    def resolve(self, employee_id: int, as_of_date: date) -> SalaryDTO:
+    def get_employee_salary(self, employee_id: int, position_id:int):
         if employee_id <= 0:
-            raise SalaryServiceError("Invalid employee id")
+            raise SalaryServiceError("Invalid employee ID")
+        try:
+            # query employee-specific salaries first (by employee_id)
+            salary = self.db.query(EmployeeSalary).filter(EmployeeSalary.employee_id == employee_id).order_by(EmployeeSalary.effective_from.desc()).first()
+            if not salary:
+                # fallback to the current position salary if available
+                salary = self.get_current_position_salary(position_id)
+                if not salary:
+                    raise SalaryNotFoundError(f"Salary not found for employee {employee_id}")
+        
+        except SQLAlchemyError as e:
+            raise SalaryServiceError(f"DB error fetching salary: {e}")
+        return salary.amount
 
-        employee = self.employee_repo.get_by_id(employee_id)
-        if not employee:
-            raise SalaryNotFoundError(f"Employee {employee_id} not found")
+    def get_effective_employee_salary(self, employee_id: int, target_date: date):
+        if employee_id <= 0:
+            raise SalaryServiceError("Invalid employee ID")
+        try:
+            salary = self.db.query(EmployeeSalary).filter(
+                EmployeeSalary.employee_id == employee_id,
+            ).filter(EmployeeSalary.effective_from <= target_date)
+            salary = salary.filter((EmployeeSalary.effective_to == None) | (EmployeeSalary.effective_to >= target_date))
+            salary = salary.order_by(EmployeeSalary.effective_from.desc()).first()
+        except SQLAlchemyError as e:
+            raise SalaryServiceError(f"DB error finding effective salary: {e}")
+        if not salary:
+            raise SalaryNotFoundError(f"No effective salary for employee {employee_id} on {target_date}")
+        return salary
 
-        # 1) Try employee salary
-        emp_salary = self.emp_salary_repo.get_active(employee_id, as_of_date)
-        if emp_salary:
-            return SalaryDTO(amount=emp_salary.amount, currency=emp_salary.currency, pay_frequency=emp_salary.salary_type.value)
+    def add_employee_salary(self, employee_id:int, amount:float, salary_type:PayFrequency = PayFrequency.MONTHLY, effective_from:datetime|None=None, created_by:int|None=None):
+        effective_from = effective_from or datetime.utcnow()
+        salary = EmployeeSalary(
+            employee_id=employee_id,
+            amount=amount,
+            salary_type=salary_type,
+            effective_from=effective_from,
+            created_by=created_by or 0
+        )
+        try:
+            self.db.add(salary)
+            self.db.commit()
+            self.db.refresh(salary)
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            raise SalaryServiceError(f"Failed to add employee salary: {e}")
+        return salary
 
-        # 2) Fall back to position salary if employee has position
-        if getattr(employee, "position_id", None):
-            pos_salary = self.pos_salary_repo.get_active(employee.position_id, as_of_date)
-            if pos_salary:
-                return SalaryDTO(amount=pos_salary.amount, currency=pos_salary.currency, pay_frequency=pos_salary.salary_type.value)
+    def get_position_salaries(self, position_id:int):
+        if position_id <= 0:
+            raise SalaryServiceError("Invalid position ID")
+        try:
+            result = self.db.query(PositionSalary).filter(PositionSalary.position_id == position_id).order_by(PositionSalary.effective_from).all()
+        except SQLAlchemyError as e:
+            raise SalaryServiceError(f"DB error fetching position salaries: {e}")
+        return result
+    
+    def get_current_position_salary(self, position_id: int) -> PositionSalary | None:
+       if position_id <= 0:
+            raise SalaryServiceError("Invalid position ID")
+       try:
+            position_salary = self.db.query(PositionSalary).filter(
+                 PositionSalary.position_id == position_id,
+                 PositionSalary.effective_from <= date.today(),
+             ).filter(
+                 (PositionSalary.effective_to == None) | (PositionSalary.effective_to >= date.today())
+             ).order_by(PositionSalary.effective_from.desc()).first()
+       except SQLAlchemyError as e:
+           raise SalaryServiceError(f"DB error fetching current position salary: {e}")
+       return position_salary
+    
 
-        # 3) Nothing found
-        raise SalaryNotFoundError(f"No effective salary for employee {employee_id} on {as_of_date}")
+    def add_position_salary(self, position_id:int, amount:float, salary_type:PayFrequency = PayFrequency.MONTHLY, effective_from:datetime|None=None, created_by:int|None=None):
+        if position_id <= 0:
+            raise SalaryServiceError("Invalid position ID")
+        position = self.db.query(Position).filter(Position.id == position_id).first()
+        if not position:
+            raise SalaryServiceError(f"Position with ID {position_id} does not exist")
+        effective_from = effective_from or datetime.utcnow()
+        position_salary = PositionSalary(
+            position_id=position_id,
+            amount=amount,
+            salary_type=salary_type,
+            effective_from=effective_from,
+            created_by=created_by or 0
+        )
+        try:
+            self.db.add(position_salary)
+            self.db.commit()
+            self.db.refresh(position_salary)
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            raise SalaryServiceError(f"Failed to add position salary: {e}")
+        return position_salary

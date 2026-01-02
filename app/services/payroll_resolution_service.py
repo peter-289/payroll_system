@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 from app.services.deduction_service import DeductionService
-from app.services.salary_service_impl import SalaryService
+from app.services.salary_service import SalaryService
 from app.services.tax_service import TaxService
 from app.services.allowance_type_service import AllowanceTypeService
 from app.services.attendance_service import AttendanceService
 from app.services.loan_service import LoanService
-from app.services.insuarance_service import InsuranceService
+from app.services.insurance_service import InsuranceService
 from app.services.pension_service import PensionService
 from app.services.department_service import DepartmentService
-from app.services.user_service import EmployeeService
+from app.services.employee_service import EmployeeService
 from datetime import date
 from app.schemas.payroll_schema import ResolvedPayrollInputs
 

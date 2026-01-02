@@ -8,7 +8,8 @@ from app.models.department_model import Department
 from app.schemas.employee_schema import EmployeeCreate, EmployeeCreateResponse
 from app.models.employee_bank_account import EmployeeBankAccount
 from app.models.employee_contacts_details import EmployeeContact
-from app.dependancies.security import hash_password, create_temporary_password, parse_date
+from app.core.security import create_temporary_password, parse_date
+from app.core.hashing import hash_password
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import date
 

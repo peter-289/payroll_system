@@ -19,3 +19,4 @@ class LoginResponse(BaseModel):
     user_id: int
     username: str
     role: str
+    must_change_password:bool

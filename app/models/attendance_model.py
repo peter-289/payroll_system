@@ -1,12 +1,11 @@
 from app.db.database_setup import Base
-from sqlalchemy import String, Date, Column, Integer, ForeignKey, Float, DateTime, event
+from sqlalchemy import String, Date, Column, Integer,Enum, ForeignKey, Float, DateTime, event
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
 import pytz
+from app.domain.enums import AttendanceStatus
 
 EAT = pytz.timezone("Africa/Nairobi")
-
 
 class Attendance(Base):
     __tablename__ = "attendance"
@@ -16,11 +15,11 @@ class Attendance(Base):
     attendance_date = Column(Date, default=func.current_date(), nullable=False)
     check_in = Column(DateTime(timezone=True), nullable=True)
     check_out = Column(DateTime(timezone=True), nullable=True)
-    status = Column(String, default="present")
+    regular_hours = Column(Float, default=0.0)
     hours_worked = Column(Float, default=0.0)
     overtime_hours = Column(Float, default=0.0)
     remarks = Column(String, nullable=True)
-    approved = Column(String, nullable=True, default="pending")
+    approved = Column(Enum(AttendanceStatus), nullable=True, default=AttendanceStatus.PENDING)
 
 
 #=======================================================================================================

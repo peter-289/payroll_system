@@ -2,20 +2,20 @@
 
 from datetime import date, datetime, timedelta
 from typing import Optional, List
-import hashlib
 import os
-import binascii
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from app.models.user_model import User
 from pydantic import BaseModel
-from app.models.employee_model import Employee
+from app.core.config import LOGIN_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+from app.repositories.employee_repo import EmployeeRepository
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
-from app.config import LOGIN_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+
 
 class Token(BaseModel):
     access_token: str
@@ -27,37 +27,13 @@ class TokenData(BaseModel):
     username: Optional[str] = None
     permissions: List[str] = []
 
-def hash_password(password: str) -> str:
-    """Hash password with PBKDF2-HMAC-SHA256; return salt+hash hex string."""
-    salt = os.urandom(16)
-    dk = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100_000)
-    return binascii.hexlify(salt).decode() + ':' + binascii.hexlify(dk).decode()
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a plain password against the hashed password using PBKDF2."""
-    try:
-        salt_hex, dk_hex = hashed_password.split(':')
-        salt = binascii.unhexlify(salt_hex)
-        expected = binascii.unhexlify(dk_hex)
-        dk = hashlib.pbkdf2_hmac('sha256', plain_password.encode('utf-8'), salt, 100_000)
-        if len(dk) != len(expected):
-            return False
-        result = 0
-        for a, b in zip(dk, expected):
-            result |= a ^ b
-        return result == 0
-    except Exception:
-        return False
-    
-
-
 #======================================================================================================
 #------------------------ CREATE A LOGIN TOKEN TO MANAGE SESSIONS -------------------------------------
 def create_login_token(data:dict, expires_delta:timedelta | None = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=LOGIN_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp":expire})
-    token = jwt.encode(to_encode,SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
 
@@ -65,7 +41,8 @@ def create_login_token(data:dict, expires_delta:timedelta | None = None):
 #======================================================================================================
 #------------------------ DECODE TOKEN ---------------------------------------------------------------
 def get_current_employee(
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(oauth2_scheme),
+    db:Session = Depends(get_db)
 ):
     """Get the current authenticated employee from the JWT token."""
     credentials_exception = HTTPException(
@@ -73,18 +50,25 @@ def get_current_employee(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    employee_repo = EmployeeRepository(db)
     try:
+        
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: int = payload.get("sub")
         role: str = payload.get("role")
-        if user_id is None:
-            raise credentials_exception
         
+        employee = employee_repo.get_employee(user_id)
+    
+
+
+        if user_id is None:
+            print("Token mismatch")
+     
     except JWTError:
         raise credentials_exception
 
     return {
-         "user_id": user_id,"role":role
+         "user_id": user_id, "employee_id":employee.id, "role":role
     }
 
 

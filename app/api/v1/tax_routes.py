@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from app.dependancies.security import admin_access
+from app.core.security import admin_access
 from app.schemas.tax_schema import TaxCreate, TaxResponse, TaxBracketCreate, TaxRuleUpdate, TaxBracketUpdate
 from app.db.database_setup import get_db
 from app.services.tax_service import TaxService

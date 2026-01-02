@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.allowances_model import Allowance
 from datetime import datetime
 from app.services.allowance_type_service import AllowanceTypeService
-from app.services.insuarance_service import InsuranceService
+from app.services.insurance_service import InsuranceService
 from app.models.allowances_model import AllowanceStatus
 import random
 from decimal import Decimal, InvalidOperation

@@ -2,7 +2,7 @@ from asyncio.log import logger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from app.config import DATABASE_URL
+from app.core.config import DATABASE_URL
 
 
 

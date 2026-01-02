@@ -6,7 +6,7 @@ from app.models.department_model import Department
 from app.models.Position_model import Position
 from fastapi import HTTPException, status
 from app.db.database_setup import SessionLocal
-from app.services.salary_service_impl import SalaryService
+from app.services.salary_service import SalaryService
 from app.models.salary_model import PositionSalary, PayFrequency
 from datetime import date
 

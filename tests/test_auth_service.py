@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 from app.services.auth_service import AuthService
 from app.exceptions.exceptions import InvalidCredentialsError, UserNotFoundError
-from app.dependancies.security import hash_password
+from payroll_system.app.core.security import hash_password
 
 
 class FakeQuery:

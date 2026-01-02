@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from app.schemas.tax_schema import TaxBracketCreate, TaxBracketUpdate, TaxCreate
-from app.utility_funcs.tax_bracket_validator import validate_no_overlaps
+from app.utils.tax_bracket_validator import validate_no_overlaps
 from app.models.tax_model import TaxType, Tax
 from app.models.tax_brackets import TaxBracket
 from app.exceptions.exceptions import TaxServiceError, TaxRuleNotFoundError, InvalidTaxBracketsError

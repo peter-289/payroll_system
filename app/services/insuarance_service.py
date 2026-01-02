@@ -3,7 +3,10 @@ from app.schemas.insurance_schema import InsuranceCreate, InsuranceResponse
 from app.models.Insuarance_model import Insurance
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+import logging
 from app.exceptions.exceptions import InsuranceServiceError, InsuranceRecordNotFoundError
+
+logger = logging.getLogger(__name__) 
 
 
 
@@ -19,7 +22,7 @@ class InsuranceService:
     def create_insurance(self, data: InsuranceCreate):
         # Ensure policy number doesn’t duplicate
         policy_number = self._generate_policy_number()
-        print(policy_number)
+        logger.debug("Generated policy number: %s", policy_number)
         existing = self.db.query(Insurance).filter(
             Insurance.policy_number == policy_number
         ).first()

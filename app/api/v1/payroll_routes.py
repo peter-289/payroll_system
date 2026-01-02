@@ -1,14 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import Optional
 from app.db.database_setup import get_db
 from app.schemas.payroll_schema import PayrollInput, PayrollResult
 from app.services.payroll_engine import PayrollEngine
 from app.services.user_service import EmployeeService
 from app.exceptions.exceptions import EmployeeNotFoundError, PayrollEngineError
-from app.dependancies.security import get_current_employee, admin_hr_or_self
-from app.schemas.payroll_schema import PayrollRunRequest, PayrollRunResponse
-from app.exceptions.exceptions import PayrollRunError
+from app.core.security import get_current_employee, admin_hr_or_self
 
 router = APIRouter(prefix="/api/v1", tags=["Payrolls"])
 

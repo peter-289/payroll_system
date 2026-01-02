@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.deductions_model import Deduction, DeductionType, DeductionBracket
 from app.exceptions.exceptions import DeductionServiceError, DeductionNotFoundError
 from sqlalchemy.exc import SQLAlchemyError
-from app.utility_funcs.tax_bracket_validator import validate_no_overlaps
+from app.utils.tax_bracket_validator import validate_no_overlaps
 
 
 class DeductionService:

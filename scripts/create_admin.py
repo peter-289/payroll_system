@@ -2,8 +2,8 @@ from fastapi import Depends
 from app.models.roles_model import Role
 from sqlalchemy.orm import Session
 from app.models.user_model import User
-from app.dependancies.security import hash_password, verify_password
-from app.config import ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD
+from app.core.hashing import hash_password, verify_password
+from app.core.config import ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD
 from app.db.database_setup import get_db
 
 
@@ -37,7 +37,7 @@ def seed_admin(db:Session = Depends(get_db)):
         else:
             print('Admin user exists id:', user.id)
         # verify password
-        ok = verify_password(ADMIN_PASSWORD, user.password_hash)
+        ok = verify_password(user.password_hash, ADMIN_PASSWORD)
         print('Password verify:', ok)
     except Exception as e:
         print('Error seeding admin user:', e)

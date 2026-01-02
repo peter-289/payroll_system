@@ -6,19 +6,19 @@ from scripts.create_admin import seed_admin
 from app.db.database_setup import SessionLocal
 
 # Import all routers
-from app.api.department_routes import router as department_router
-from app.api.tax_routes import router as tax_router
-from app.api.user_routes import router as user_router
-from app.api.auth_routes import router as auth_router
-from app.api.attendance_routes import router as attendance_router
-from app.api.allowance_type_routes import router as allowance_type_router
-from app.api.insuarance_routes import router as insurance_router
-from app.api.allowance_routes import router as allowance_router
-from app.api.payroll_routes import router as payroll_router
-from app.api.salary_routes import router as salary_router
-from app.api.deduction_routes import router as deduction_router
-from app.api.pension_routes import router as pension_router
-from app.api.loan_routes import router as loan_router
+from app.api.v1.department_routes import router as department_router
+from app.api.v1.tax_routes import router as tax_router
+from app.api.v1.user_routes import router as user_router
+from app.api.v1.auth_routes import router as auth_router
+from app.api.v1.attendance_routes import router as attendance_router
+from app.api.v1.allowance_type_routes import router as allowance_type_router
+from app.api.v1.insuarance_routes import router as insurance_router
+from app.api.v1.allowance_routes import router as allowance_router
+from app.api.v1.payroll_routes import router as payroll_router
+from app.api.v1.salary_routes import router as salary_router
+from app.api.v1.deduction_routes import router as deduction_router
+from app.api.v1.pension_routes import router as pension_router
+from app.api.v1.loan_routes import router as loan_router
 #from backend.routes.payroll_routes import router as payroll_router
 #from backend.routes.deduction_routes import router as deduction_router
 #from backend.routes.employee_routes import router as employee_router
