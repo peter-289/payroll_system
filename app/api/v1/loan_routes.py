@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from app.services.loan_service import LoanService
-from app.exceptions.exceptions import LoanServiceError, LoanNotFoundError
+from app.domain.exceptions.base import LoanServiceError, LoanNotFoundError
 from app.schemas.loan_schema import LoanCreate, LoanResponse
 
 router = APIRouter(prefix='/api/v1', tags=['Loans'])

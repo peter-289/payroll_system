@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.Loans_advances_model import Loan
 from sqlalchemy.exc import SQLAlchemyError
-from app.exceptions.exceptions import LoanServiceError, LoanNotFoundError
+from app.domain.exceptions.base import LoanServiceError, LoanNotFoundError
 
 
 class LoanService:

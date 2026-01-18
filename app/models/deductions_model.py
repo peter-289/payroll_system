@@ -1,12 +1,10 @@
 from app.db.database_setup import Base
 from sqlalchemy import (
-    Column, Integer, String, Numeric, Date, Text, DateTime, ForeignKey, 
-    Index, CheckConstraint, Enum, Boolean
+    Column, Integer, String, Numeric, DateTime, ForeignKey, 
+    Boolean, func, Enum
 )
 from sqlalchemy.orm import relationship
-from datetime import datetime
-from enum import Enum as PyEnum
-from decimal import Decimal
+from app.domain.enums import DeductionStatus
 
 
 class DeductionType(Base):
@@ -17,9 +15,10 @@ class DeductionType(Base):
     code = Column(String(20), unique=True, nullable=False)      # "PAYE", "NHIF", "NSSF_EMP"
     is_statutory = Column(Boolean, default=False)               # True for legal deductions
     is_taxable = Column(Boolean, default=False)                 # Does it reduce taxable income?
-    has_brackets = Column(Boolean, default=False)  
-    created_at = Column(DateTime, default=datetime.utcnow())
-    updated_at = Column(DateTime, default=datetime.utcnow(), onupdate=datetime.utcnow())  # True for tiered (PAYE, NHIF)
+    has_brackets = Column(Boolean, default=False)
+    status =  Column(Enum(DeductionStatus), default=DeductionStatus.ACTIVE)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now())  # True for tiered (PAYE, NHIF)
 
     deductions = relationship("Deduction", back_populates="deduction_type")
     brackets = relationship("DeductionBracket", back_populates="deduction_type")
@@ -36,7 +35,7 @@ class DeductionBracket(Base):
 
     deduction_type = relationship("DeductionType", back_populates="brackets")
     
-
+    
 class Deduction(Base):
     __tablename__ = "deductions"
 

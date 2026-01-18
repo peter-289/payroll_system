@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from app.services.salary_service import SalaryService
-from app.exceptions.exceptions import SalaryServiceError, SalaryNotFoundError
+from app.domain.exceptions.base import SalaryServiceError, SalaryNotFoundError
 from app.schemas.pension_schema import PensionResponse
 from app.models.salary_model import PayFrequency
 from datetime import date

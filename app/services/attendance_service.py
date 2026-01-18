@@ -47,7 +47,7 @@ class AttendanceService:
             check_out: datetime,
             remarks: str | None)->Attendance:
     
-        attendance_date = attendance_date or check_in.date()
+        attendance_date = attendance_date or check_out.date()
         try:
            attendance = self.attendance_repo.get_by_employee_and_date(employee_id, attendance_date)
            attendance_rules.validate_checkout(attendance.check_in, check_out)

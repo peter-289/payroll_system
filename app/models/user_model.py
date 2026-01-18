@@ -27,6 +27,5 @@ class User(Base):
 #-----------------------------------------------------------------------------------------------------
     role = relationship("Role", back_populates="users")
     employee = relationship("Employee", back_populates="user", uselist=False)
-    tokens = relationship("TokenModel", back_populates="user", cascade="all, delete-orphan")
     position_salaries = relationship("PositionSalary", back_populates="user")
     employee_salaries = relationship("EmployeeSalary", back_populates="user")

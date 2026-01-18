@@ -7,9 +7,25 @@ from app.domain.enums import AttendanceStatus
 
 class AttendanceRepository:
     def __init__(self, db:Session):
+        """
+        Docstring for __init__
+        
+        :param self: Description
+        :param db: Description
+        :type db: Session
+        """
         self.db = db
 
     def save(self, attendance: Attendance) -> Attendance:
+        """
+        Docstring for save
+        
+        :param self: Description
+        :param attendance: Description
+        :type attendance: Attendance
+        :return: Description
+        :rtype: Attendance
+        """
         self.db.add(attendance)
         self.db.commit()
         self.db.refresh(attendance)

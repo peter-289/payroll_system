@@ -3,7 +3,7 @@ from app.services.allowance_service import AllowanceService
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
-from app.exceptions.exceptions import AllowanceServiceError, AllowanceRecordNotFoundError, AllowanceTypeNotFoundError
+from app.domain.exceptions.base import AllowanceServiceError, AllowanceRecordNotFoundError, AllowanceTypeNotFoundError
 
 router = APIRouter(
     prefix="/api/v1", tags=["Allowances"]

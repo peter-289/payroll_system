@@ -4,7 +4,7 @@ from app.models.Insuarance_model import Insurance
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import logging
-from app.exceptions.exceptions import InsuranceServiceError, InsuranceRecordNotFoundError
+from app.domain.exceptions.base import InsuranceServiceError, InsuranceRecordNotFoundError
 
 logger = logging.getLogger(__name__) 
 

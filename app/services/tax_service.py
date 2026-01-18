@@ -4,7 +4,7 @@ from app.schemas.tax_schema import TaxBracketCreate, TaxBracketUpdate, TaxCreate
 from app.utils.tax_bracket_validator import validate_no_overlaps
 from app.models.tax_model import TaxType, Tax
 from app.models.tax_brackets import TaxBracket
-from app.exceptions.exceptions import TaxServiceError, TaxRuleNotFoundError, InvalidTaxBracketsError
+from app.domain.exceptions.base import TaxServiceError, TaxRuleNotFoundError, InvalidTaxBracketsError
 from datetime import datetime
 
 

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.pension_model import Pension
 from sqlalchemy.exc import SQLAlchemyError
-from app.exceptions.exceptions import PensionServiceError, PensionNotFoundError
+from app.domain.exceptions.base import PensionServiceError, PensionNotFoundError
 
 
 class PensionService:

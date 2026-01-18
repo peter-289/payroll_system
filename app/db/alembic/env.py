@@ -8,7 +8,7 @@ from alembic import context
 from app.db.database_setup import Base
 
 #models
-from app.models import allowances_model, attendance_model,deductions_model, department_model, Insuarance_model, salary_model,tax_brackets, tax_model, token_model, Loans_advances_model, employee_bank_account, user_model, employee_contacts_details, employee_model, payroll_model,pension_model,permissions_model,Position_model,role_permission, roles_model
+from app.models import allowances_model, attendance_model,deductions_model, department_model, Insuarance_model, salary_model,tax_brackets, tax_model, Loans_advances_model, employee_bank_account, user_model, employee_contacts_details, employee_model, payroll_model,pension_model,permissions_model,Position_model,role_permission, roles_model
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

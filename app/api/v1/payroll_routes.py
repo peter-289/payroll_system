@@ -4,7 +4,7 @@ from app.db.database_setup import get_db
 from app.schemas.payroll_schema import PayrollInput, PayrollResult
 from app.services.payroll_engine import PayrollEngine
 from app.services.user_service import EmployeeService
-from app.exceptions.exceptions import EmployeeNotFoundError, PayrollEngineError
+from app.domain.exceptions.base import EmployeeNotFoundError, PayrollEngineError
 from app.core.security import get_current_employee, admin_hr_or_self
 
 router = APIRouter(prefix="/api/v1", tags=["Payrolls"])

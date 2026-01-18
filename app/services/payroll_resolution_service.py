@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from app.services.deduction_service import DeductionService
 from app.services.salary_service import SalaryService
 from app.services.tax_service import TaxService
-from app.services.allowance_type_service import AllowanceTypeService
 from app.services.attendance_service import AttendanceService
 from app.services.loan_service import LoanService
 from app.services.insurance_service import InsuranceService
@@ -20,7 +19,6 @@ class PayrollResolutionService:
         self.deduction_service = DeductionService(db)
         self.salary_service = SalaryService(db)
         self.tax_service = TaxService(db)
-        self.allowance_service = AllowanceTypeService(db)
         self.attendance_service = AttendanceService(db)
         self.loan_service = LoanService(db)
         self.insurance_service = InsuranceService(db)

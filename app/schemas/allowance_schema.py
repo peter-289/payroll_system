@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 from decimal import Decimal
+from app.domain.enums import AllowanceCalculationType, AllowancePercentageBasis
 
 
 class AllowanceTypeBase(BaseModel):
@@ -9,8 +10,8 @@ class AllowanceTypeBase(BaseModel):
     description: Optional[str] = None
     is_taxable: Optional[bool] = True
     is_recurring: Optional[bool] = True
-    is_percentage_based: Optional[bool] = False
-    percentage_of: Optional[str] = None  # "basic_salary" or "gross_salary"
+    calculation_type: AllowanceCalculationType
+    percentage_of: Optional[AllowancePercentageBasis] = None  # "basic_salary" or "gross_salary"
     default_amount: Optional[Decimal] = Field(default=None, decimal_places=2)
     min_amount: Optional[Decimal] = Field(default=None, decimal_places=2)
     max_amount:Optional[Decimal]
@@ -23,9 +24,9 @@ class AllowanceTypeCreate(AllowanceTypeBase):
 class AllowanceTypeResponse(AllowanceTypeBase):
     id: int
     code: str
-    is_active: str
+    status: str
     created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+
     
     class Config:
         from_attributes = True
@@ -35,9 +36,8 @@ class AllowanceBase(BaseModel):
     payroll_id: int
     allowance_type_id: int
     amount: Decimal = Field(..., decimal_places=2)
-    description: Optional[str] = None
     calculation_basis: Optional[str] = None  # e.g., "fixed", "percentage"
-    Reference_number: Optional[str] = None
+    
 
 class AllowanceCreate(AllowanceBase):
     pass
@@ -49,7 +49,7 @@ class AllowanceResponse(AllowanceBase):
     code: str
     status:str
     created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    
     
     class Config:
         from_attributes = True

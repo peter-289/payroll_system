@@ -5,7 +5,7 @@ from app.services.department_service import DepartmentService
 from typing import List
 from app.schemas.department_schema import DepartmentResponse, DepartmentCreate
 from app.schemas.position_schema import PositionResponse
-from app.exceptions.exceptions import DepartmentServiceError, DepartmentAlreadyExistsError
+from app.domain.exceptions.base import DepartmentServiceError, DepartmentAlreadyExistsError
 
 router = APIRouter(prefix="/api/v1", tags=["Department"])
 

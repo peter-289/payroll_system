@@ -4,7 +4,7 @@ from app.core.security import admin_access
 from app.schemas.tax_schema import TaxCreate, TaxResponse, TaxBracketCreate, TaxRuleUpdate, TaxBracketUpdate
 from app.db.database_setup import get_db
 from app.services.tax_service import TaxService
-from app.exceptions.exceptions import TaxServiceError, TaxRuleNotFoundError, InvalidTaxBracketsError
+from app.domain.exceptions.base import TaxServiceError, TaxRuleNotFoundError, InvalidTaxBracketsError
 
 
 
@@ -30,7 +30,7 @@ def add_tax_rule(
     except InvalidTaxBracketsError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except TaxServiceError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 #======================================================================================================
@@ -48,7 +48,7 @@ def update_tax_rule(
     except TaxRuleNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except TaxServiceError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 #======================================================================================================
 #---------------------------- UPDATE TAX BRACKETS ------------------------------------------------------
@@ -67,7 +67,7 @@ def update_tax_brackets(
     except InvalidTaxBracketsError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except TaxServiceError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 #======================================================================================================
 #---------------------------- GET TAX RULE BY ID ------------------------------------------------------
@@ -99,4 +99,4 @@ def delete_tax_rule(taxes_id:int, db:Session =Depends(get_db)):
     except TaxRuleNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except TaxServiceError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

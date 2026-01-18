@@ -4,7 +4,7 @@ from app.schemas.insurance_schema import InsuranceResponse,InsuranceCreate
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from typing import List
-from app.exceptions.exceptions import InsuranceServiceError, InsuranceRecordNotFoundError
+from app.domain.exceptions.base import InsuranceServiceError, InsuranceRecordNotFoundError
 
 router = APIRouter(prefix="/api/v1", tags=["Insurance"])
 

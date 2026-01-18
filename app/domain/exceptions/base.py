@@ -1,6 +1,29 @@
 from typing import Any
 
 
+#===============================================================================================
+#---------------- VALIDATION EXCEPTIONS --------------------------------------------------------
+class ValidationError(Exception):
+    def __init__(self, message: str | None = None):
+        super().__init__(message or "Validation error")
+
+class EmailValidationError(ValidationError):
+    pass
+
+class PhoneValidationError(ValidationError):
+    pass
+
+class AgeValidationError(ValidationError):
+    pass
+
+class AccountValidationError(ValidationError):
+    pass
+
+
+
+
+#=============================================================================================
+#-------------------- EMPLOYEE SERVICE EXCEPTIONS --------------------------------------------
 class EmployeeServiceError(Exception):
     """Base exception for employee service errors"""
     def __init__(self, message: str | None = None):
@@ -35,7 +58,8 @@ class EmployeeNotFoundError(EmployeeServiceError):
     pass
 
 
-# Payroll related exceptions
+#==============================================================================================
+#------------------ PAYROLL ENGINE EXCEPTIONS -------------------------------------------------
 class PayrollEngineError(Exception):
     """Base exception for payroll engine"""
     def __init__(self, message: str | None = None, payload: Any | None = None):
@@ -79,7 +103,8 @@ class InvalidTaxBracketsError(TaxServiceError):
 
 
 
-# Allowance related exceptions
+# ========================================================================================
+# -------------- ALLOWANCE SERVICE EXCEPTIONS --------------------------------------------
 class AllowanceServiceError(Exception):
     """Base exception for allowance service errors"""
     def __init__(self, message: str | None = None):

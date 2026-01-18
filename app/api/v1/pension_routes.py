@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from app.services.pension_service import PensionService
-from app.exceptions.exceptions import PensionServiceError, PensionNotFoundError
+from app.domain.exceptions.base import PensionServiceError, PensionNotFoundError
 from app.schemas.pension_schema import PensionCreate, PensionResponse
 
 router = APIRouter(prefix='/api/v1', tags=['Pension'])

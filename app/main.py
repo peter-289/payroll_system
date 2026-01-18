@@ -95,4 +95,4 @@ app.include_router(deduction_router)
 app.include_router(salary_router)
 app.include_router(pension_router)
 app.include_router(loan_router)
-app.include_router(payroll_router)
+

@@ -6,7 +6,7 @@ from app.schemas.employee_schema import EmployeeCreate, EmployeeResponse, Employ
 from app.services.user_service import (
     EmployeeService,
 )
-from app.exceptions.exceptions import (
+from app.domain.exceptions.base import (
     EmployeeServiceError,
     UserAlreadyExistsError,
     RoleNotFoundError,
@@ -35,13 +35,14 @@ def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
         return result
     except UserAlreadyExistsError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists")
-    except (RoleNotFoundError, DepartmentNotFoundError, PositionNotFoundError):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role, department, or position")
-    except (ContactAlreadyExistsError, BankAccountAlreadyExistsError):
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Contact or bank account already exists")
-    except EmployeeServiceError:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create employee")
-
+    except (RoleNotFoundError, DepartmentNotFoundError, PositionNotFoundError) as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid role, department, or position: {str(e)}")
+    except (ContactAlreadyExistsError, BankAccountAlreadyExistsError) as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Contact or bank account already exists: {str(e)}")
+    except EmployeeServiceError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Server Error: {str(e)}")
 #======================================================================================================
 #----------------------------- GET EMPLOYEE BY ID ---------------------------------------------------
 #======================================================================================================

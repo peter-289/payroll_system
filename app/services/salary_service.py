@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.salary_model import EmployeeSalary, PositionSalary, PayFrequency
-from app.exceptions.exceptions import SalaryServiceError, SalaryNotFoundError
+from app.domain.exceptions.base import SalaryServiceError, SalaryNotFoundError
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, date
 from app.models.Position_model import Position

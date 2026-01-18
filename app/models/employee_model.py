@@ -5,12 +5,7 @@ from datetime import datetime
 from datetime import date
 from enum import Enum
 from sqlalchemy import Enum as SqlEnum
-
-
-class SalaryTypeEnum(str, Enum):
-    MONTHLY = "monthly"
-    HOURLY = "hourly"
-    CONTRACT = "contract"
+from app.domain.enums import SalaryTypeEnum
 
 class Employee(Base):
     __tablename__ = "employees"

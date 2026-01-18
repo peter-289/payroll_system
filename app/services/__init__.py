@@ -8,7 +8,6 @@ from .auth_service import *
 from .department_service import *
 from .attendance_service import *
 from .allowance_service import *
-from .allowance_type_service import *
 from .deduction_service import *
 from .loan_service import *
 from .payroll_service import *

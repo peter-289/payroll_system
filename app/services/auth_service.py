@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from app.core.hashing import verify_password, hash_password
 from app.core.security import create_login_token
-from app.exceptions.exceptions import AuthServiceError, InvalidCredentialsError, UserNotFoundError
+from app.domain.exceptions.base import AuthServiceError, InvalidCredentialsError, UserNotFoundError
 from app.repositories.user_repo import UserRepository
 from app.repositories.role_repo import RoleRepository
 
