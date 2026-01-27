@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from app.services.deduction_service import DeductionService
-from app.domain.exceptions.base import DeductionServiceError, DeductionNotFoundError
+from app.domain.exceptions.base import DomainError, DeductionNotFoundError
 from app.schemas.deduction_schema import DeductionCreate, DeductionResponse
 from app.repositories.deduction_repo import DeductionRepository
 
@@ -20,7 +20,7 @@ def create_deduction(payload: DeductionCreate, service: DeductionService = Depen
     
         deduction= service.create_deduction_type(payload)
         return deduction
-    except DeductionServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -46,7 +46,7 @@ def update_deduction(id:int, payload: DeductionCreate, service: DeductionService
         return service.update_deduction(id, payload)
     except DeductionNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except DeductionServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
@@ -59,5 +59,5 @@ def delete_deduction(deduction_id:int, db: Session = Depends(get_db)):
         return None
     except DeductionNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except DeductionServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

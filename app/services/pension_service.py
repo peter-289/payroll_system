@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.pension_model import Pension
 from sqlalchemy.exc import SQLAlchemyError
-from app.domain.exceptions.base import PensionServiceError, PensionNotFoundError
+from app.domain.exceptions.base import DomainError, PensionNotFoundError
 
 
 class PensionService:
@@ -24,7 +24,7 @@ class PensionService:
             self.db.refresh(pension)
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise PensionServiceError(f"Failed to create pension: {e}")
+            raise DomainError(f"Failed to create pension: {e}")
         return pension
 
     def get_pension(self, pension_id:int):
@@ -35,7 +35,7 @@ class PensionService:
     
     def get_employee_pension(self, employee_id:int):
         if employee_id<=0:
-            raise PensionServiceError("Invalid ID")
+            raise DomainError("Invalid ID")
         pension = self.db.query(Pension).filter(Pension.employee_id == employee_id).first()
         if not pension:
             raise PensionNotFoundError(f"Pension with employee id: {employee_id} not found.")
@@ -54,5 +54,5 @@ class PensionService:
             self.db.commit()
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise PensionServiceError(f"Failed to delete pension: {e}")
+            raise DomainError(f"Failed to delete pension: {e}")
         return {"message":"Pension deleted successfully"}

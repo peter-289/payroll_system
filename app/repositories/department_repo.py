@@ -10,13 +10,9 @@ class DepartmentRepository:
 
     def save_department(self, department: Department) -> Department:
         self.db.add(department)
-        self.db.commit()
-        self.db.refresh(department)
         return department
 
     def update_department(self, department: Department) -> Department:
-        self.db.commit()
-        self.db.refresh(department)
         return department
 
     def get_department_by_id(self, department_id: int) -> Optional[Department]:
@@ -30,7 +26,6 @@ class DepartmentRepository:
 
     def delete_department(self, department: Department) -> None:
         self.db.delete(department)
-        self.db.commit()
 
     # Position related methods
     def get_positions_by_department(self, department_id: int) -> List[Position]:

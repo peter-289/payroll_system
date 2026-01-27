@@ -2,15 +2,16 @@ from os import name
 from app.models.deductions_model import Deduction, DeductionType, DeductionBracket
 from app.repositories.deduction_repo import DeductionRepository
 from app.domain.rules import deduction_rules
-from app.domain.exceptions.base import DeductionServiceError, DeductionNotFoundError
+from app.domain.exceptions.base import DomainError, DeductionNotFoundError
 from sqlalchemy.exc import SQLAlchemyError
 from app.utils.tax_bracket_validator import validate_no_overlaps
 import uuid
+from app.core.unit_of_work import UnitOfWork
 
 
 class DeductionService:
-    def __init__(self, deduction_repo: DeductionRepository):
-        self.deduction_repo = deduction_repo
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
     
     def _generate_deduction_code(self, name: str) -> str:
         prefix = name[:3].upper()
@@ -29,7 +30,7 @@ class DeductionService:
         :type brackets: list
         """
         if type_id <= 0:
-            raise DeductionServiceError("Invalid ID")
+            raise DomainError("Invalid ID")
         deduction_rules.validate_bracket(brackets)
         for bracket in brackets:
             db_bracket = DeductionBracket(
@@ -39,7 +40,7 @@ class DeductionService:
                 rate=bracket.rate,
                 fixed_amount=bracket.fixed_amount
             )
-            self.deduction_repo.save_deduction_bracket(db_bracket)
+            self.uow.deduction_repo.save_deduction_bracket(db_bracket)
             
 
     def create_deduction_type(self, payload):
@@ -65,17 +66,17 @@ class DeductionService:
             saved_deduction = self.deduction_repo.save_deduction_type(deduction)
             if payload.has_brackets:
                 if not payload.brackets:
-                    raise DeductionServiceError("Brackets must be provided for deductions with brackets")
+                    raise DomainError("Brackets must be provided for deductions with brackets")
                 self.create_deduction_brackets(saved_deduction.id, payload.brackets)
             
             return saved_deduction
         except SQLAlchemyError as e:
-            raise DeductionServiceError(f"Failed to create deduction: {e}")
+            raise DomainError(f"Failed to create deduction: {e}")
 
 
     def get_taxable_deduction(self, id: int)-> DeductionType:
         if id <= 0:
-            raise DeductionServiceError("Invalid ID")
+            raise DomainError("Invalid ID")
         deduction_type = self.deduction_repo.get_taxable_deduction_type(id)
         if not deduction_type:
             raise DeductionNotFoundError(f"Deduction with id {id} not found")
@@ -88,7 +89,7 @@ class DeductionService:
 
     def update_deduction(self, deduction_id: int, payload):
         if deduction_id <= 0:
-            raise DeductionServiceError("Invalid ID")
+            raise DomainError("Invalid ID")
         d = self.deduction_repo.get_deduction_type_by_id(deduction_id)
         if not d:
             raise DeductionNotFoundError(f"Deduction with id {deduction_id} not found")
@@ -107,26 +108,25 @@ class DeductionService:
             
             if d.has_brackets and getattr(payload, 'brackets', None):
                 validate_no_overlaps(payload.brackets)
-                
-                deduction_type = self.deduction_repo.get_deduction_type_by_id(d.id)
-                self.deduction_repo.delete_deduction_type(deduction_type)
-                self.db.flush()
-                self.create_deduction_brackets(d.id, payload.brackets)
+                with self.uow:
+                    deduction_type = self.uow.deduction_repo.get_deduction_type_by_id(d.id)
+                    self.uow.deduction_repo.delete_deduction_type(deduction_type)
+                    self.create_deduction_brackets(d.id, payload.brackets)
             elif not d.has_brackets:
-                self.deduction_repo.delete_deduction_type(deduction_type)  
+                self.uow.deduction_repo.delete_deduction_type(deduction_type)  
               
-            return self.deduction_repo.update_deduction_type(d)
+            return self.uow.deduction_repo.update_deduction_type(d)
         except SQLAlchemyError as e:
-            raise DeductionServiceError(f"Failed to update deduction: {e}")
+            raise DomainError(f"Failed to update deduction: {e}")
 
 
     def delete_deduction(self, deduction_id:int)->None:
         if deduction_id <= 0:
-            raise DeductionServiceError("Invalid ID")
-        d = self.deduction_repo.get_deduction_type_by_id(deduction_id)
+            raise DomainError("Invalid ID")
+        d = self.uow.deduction_repo.get_deduction_type_by_id(deduction_id)
         if not d:
             raise DeductionNotFoundError(f"Deduction with id {deduction_id} not found")
         try:
-            self.deduction_repo.delete_deduction_type(d)
+            self.uow.deduction_repo.delete_deduction_type(d)
         except SQLAlchemyError as e:
-            raise DeductionServiceError(f"Failed to delete deduction: {e}")
+            raise DomainError(f"Failed to delete deduction: {e}")

@@ -1,12 +1,39 @@
 from typing import Any
+from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
+
+
+# =======================================================================================================
+#-------------------- DOMAIN BASE EXCEPTIONS -----------------------------------------------------
+class DomainError(Exception):
+    """Base exception for all domain errors"""
+    def __init__(self, message: str | None = None):
+        super().__init__(message or "Domain error")
+
+class NotFoundError(DomainError):
+    """Exception for not found errors in the domain"""
+    pass
+
+class ConflictError(DomainError):
+    """Exception for conflict errors in the domain"""
+    pass
+
+class ValidationError(DomainError):
+    """Exception for validation errors in the domain"""
+    pass
+
+class PermissionError(DomainError):
+    """Exception for permission errors in the domain"""
+    pass
+
+class ComputationError(DomainError):
+    """Exception for computation errors in the domain"""
+    pass
+
 
 
 #===============================================================================================
-#---------------- VALIDATION EXCEPTIONS --------------------------------------------------------
-class ValidationError(Exception):
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Validation error")
-
+#---------------- VALIDATION EXCEPTIONS -------------------------------------------------------
 class EmailValidationError(ValidationError):
     pass
 
@@ -24,37 +51,25 @@ class AccountValidationError(ValidationError):
 
 #=============================================================================================
 #-------------------- EMPLOYEE SERVICE EXCEPTIONS --------------------------------------------
-class EmployeeServiceError(Exception):
-    """Base exception for employee service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Employee service error")
-
-
-class UserAlreadyExistsError(EmployeeServiceError):
+class UserAlreadyExistsError(ConflictError):
     pass
 
-
-class RoleNotFoundError(EmployeeServiceError):
+class RoleNotFoundError(NotFoundError):
     pass
 
-
-class DepartmentNotFoundError(EmployeeServiceError):
+class DepartmentNotFoundError(NotFoundError):
     pass
 
-
-class PositionNotFoundError(EmployeeServiceError):
+class PositionNotFoundError(NotFoundError):
     pass
 
-
-class ContactAlreadyExistsError(EmployeeServiceError):
+class ContactAlreadyExistsError(ConflictError):
     pass
 
-
-class BankAccountAlreadyExistsError(EmployeeServiceError):
+class BankAccountAlreadyExistsError(ConflictError):
     pass
 
-
-class EmployeeNotFoundError(EmployeeServiceError):
+class EmployeeNotFoundError(NotFoundError):
     pass
 
 
@@ -70,34 +85,23 @@ class PayrollEngineError(Exception):
 class InvalidPayrollInputError(PayrollEngineError):
     pass
 
-
 class TaxCalculationError(PayrollEngineError):
     pass
 
-# Department related exceptions
-class DepartmentServiceError(Exception):
-    """Base exception for department service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Department service error")
 
-
-class DepartmentAlreadyExistsError(DepartmentServiceError):
+# =============================================================================================
+#-------------------- DEPARTMENT SERVICE EXCEPTIONS ------------------------------------------
+class DepartmentAlreadyExistsError(ConflictError):
     """Raised when department with same name already exists"""
     pass
 
 
-# Tax related exceptions
-class TaxServiceError(Exception):
-    """Base exception for tax service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Tax service error")
-
-
-class TaxRuleNotFoundError(TaxServiceError):
+# =============================================================================================
+#-------------------- TAX SERVICE EXCEPTIONS ---------------------------------------------------
+class TaxRuleNotFoundError(NotFoundError):
     pass
 
-
-class InvalidTaxBracketsError(TaxServiceError):
+class InvalidTaxBracketsError(ValidationError):
     pass
 
 
@@ -105,134 +109,124 @@ class InvalidTaxBracketsError(TaxServiceError):
 
 # ========================================================================================
 # -------------- ALLOWANCE SERVICE EXCEPTIONS --------------------------------------------
-class AllowanceServiceError(Exception):
-    """Base exception for allowance service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Allowance service error")
-
-
-class AllowanceTypeNotFoundError(AllowanceServiceError):
+class AllowanceTypeNotFoundError(NotFoundError):
     pass
 
-
-class AllowanceRecordNotFoundError(AllowanceServiceError):
+class AllowanceRecordNotFoundError(NotFoundError):
       pass
 
 
-
-# Attendance related exceptions
-class AttendanceDomainError(Exception):
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Attendance domain error")
-
-class AttendanceServiceError(Exception):
-    """Base exception for allowance service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Attendance service error")
-
-class AttendanceRecordNotFoundError(AttendanceServiceError):
-    pass
-class FutureCheckInError(AttendanceServiceError):
+#=============================================================================================
+#-------------------- ATTENDANCE SERVICE EXCEPTIONS ------------------------------------------
+class AttendanceRecordNotFoundError(NotFoundError):
     pass
 
-class InvalidTimeRangeError(AttendanceServiceError):
+class FutureCheckInError(ValidationError):
     pass
 
-class OverlappingAttendanceError(AttendanceServiceError):
+class InvalidTimeRangeError(ValidationError):
     pass
 
-class OpenAttendanceExistsError(AttendanceServiceError):
+class OverlappingAttendanceError(ValidationError):
     pass
-class AttendanceNotApprovedError(AttendanceServiceError):
+
+class OpenAttendanceExistsError(ValidationError):
     pass
-class AttendanceAlreadyApprovedError(AttendanceServiceError):
+
+class AttendanceNotApprovedError(ValidationError):
     pass
-class AttendanceAlreadyExistsError(AttendanceServiceError):
+
+class AttendanceAlreadyApprovedError(ValidationError):
     pass
-class CanNotCheckoutError(AttendanceDomainError):
+
+class AttendanceAlreadyExistsError(ValidationError):
+    pass
+
+class CanNotCheckoutError(ValidationError):
     pass
 
 
-# Insurance related exceptions
-class InsuranceServiceError(Exception):
-    """Base exception for insurance service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Insurance service error")
-
-
-class InsuranceRecordNotFoundError(InsuranceServiceError):
+# =============================================================================================
+#-------------------- INSURANCE SERVICE EXCEPTIONS -----------------------------------------
+class InsuranceRecordNotFoundError(NotFoundError):
     pass
 
 
-# Auth related exceptions
-class AuthServiceError(Exception):
-    """Base exception for auth service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Authentication error")
+# =============================================================================================
+#-------------------- AUTHENTICATION & USER SERVICE EXCEPTIONS --------------------------------
+class InvalidCredentialsError(ValidationError):
+    pass
 
+class TokenExpiredError(ValidationError):
+    pass
 
-class InvalidCredentialsError(AuthServiceError):
+class InvalidTokenError(ValidationError):
+    pass
+
+class UserNotFoundError(NotFoundError):
     pass
 
 
-class TokenExpiredError(AuthServiceError):
+#=============================================================================================
+#-------------------- SALARY SERVICE EXCEPTIONS ------------------------------------------------
+class SalaryNotFoundError(NotFoundError):
     pass
 
 
-class UserNotFoundError(AuthServiceError):
-    pass
-
-
-# Salary related exceptions
-class SalaryServiceError(Exception):
-    """Base exception for salary service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Salary service error")
-
-
-class SalaryNotFoundError(SalaryServiceError):
-    pass
-
-
-class InvalidPayFrequencyError(SalaryServiceError):
+class InvalidPayFrequencyError(ValidationError):
     """Raised when an unsupported pay frequency is supplied to payroll engines"""
     pass
 
 
-# Payroll run errors
+# =============================================================================================
+#-------------------- DEDUCTION SERVICE EXCEPTIONS ---------------------------------------------
+class DeductionNotFoundError(NotFoundError):
+    pass
+
+
+# =============================================================================================
+#-------------------- PENSION SERVICE EXCEPTIONS ------------------------------------------------
+class PensionNotFoundError(NotFoundError):
+    pass
+
+
+# =============================================================================================
+#-------------------- LOAN SERVICE EXCEPTIONS ---------------------------------------------------
+class LoanNotFoundError(NotFoundError):
+    pass
+
+
+#=============================================================================================
+#-------------------- PAYROLL EXCEPTIONS -----------------------------------------------------
+class PayrollComputeError(Exception):
+    """Exception for payroll computation errors"""
+    def __init__(self, message: str | None = None):
+        super().__init__(message or "Payroll computation error")
+
+# =============================================================================================
+#-------------------- PAYROLL RUN EXCEPTIONS -------------------------------------------------
 class PayrollRunError(Exception):
     """Raised when a payroll run cannot be completed (business/domain level)."""
     pass
 
 
-# Deduction related exceptions
-class DeductionServiceError(Exception):
-    """Base exception for deduction service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Deduction service error")
 
+# =============================================================================================
+#-------------------- DOMAIN ERROR TRANSLATION ------------------------------------------------
+class DomainErrorTranslator:
+    """Translates domain exceptions to HTTP exceptions."""
 
-class DeductionNotFoundError(DeductionServiceError):
-    pass
-
-
-# Pension related exceptions
-class PensionServiceError(Exception):
-    """Base exception for pension service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Pension service error")
-
-
-class PensionNotFoundError(PensionServiceError):
-    pass
-
-
-# Loan related exceptions
-class LoanServiceError(Exception):
-    """Base exception for loan service errors"""
-    def __init__(self, message: str | None = None):
-        super().__init__(message or "Loan service error")
-
-
-class LoanNotFoundError(LoanServiceError):
-    pass
+    @staticmethod
+    def translate(exception: DomainError) -> HTTPException:
+        """Translate a DomainError into an appropriate HTTPException."""
+        if isinstance(exception, NotFoundError):
+            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": str(exception)})
+        elif isinstance(exception, ConflictError):
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"detail": str(exception)})
+        elif isinstance(exception, ValidationError):
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(exception)})
+        elif isinstance(exception, PermissionError):
+            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": str(exception)})
+        else:
+            return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": str(exception)})
+            

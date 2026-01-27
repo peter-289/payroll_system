@@ -1,6 +1,5 @@
-from app.domain.exceptions.base import AllowanceServiceError
+from app.domain.exceptions.base import ValidationError, ValidationError
 from decimal import Decimal, InvalidOperation
-from app.models.allowances_model import AllowanceType
 from app.domain.enums import AllowanceCalculationType, AllowancePercentageBasis
 
 
@@ -12,16 +11,16 @@ def validate_allowance_amount(
     try:
         amount = Decimal(amount)
     except (InvalidOperation, TypeError):
-        raise AllowanceServiceError("Amount must be a valid decimal number.")
+        raise ValidationError("Amount must be a valid decimal number.")
 
     if amount < 0:
-        raise AllowanceServiceError("Amount cannot be negative.")
+        raise ValidationError("Amount cannot be negative.")
 
     if min_amount is not None and amount < min_amount:
-        raise AllowanceServiceError(f"Amount must be >= minimum {min_amount}.")
+        raise ValidationError(f"Amount must be >= minimum {min_amount}.")
 
     if max_amount is not None and amount > max_amount:
-        raise AllowanceServiceError(f"Amount must be <= maximum {max_amount}.")
+        raise ValidationError(f"Amount must be <= maximum {max_amount}.")
 
     return amount
 
@@ -34,18 +33,18 @@ def validate_calculation_basis(
 
     if calculation_type == AllowanceCalculationType.PERCENTAGE:
         if not percentage_base:
-            raise AllowanceServiceError(
+            raise ValidationError(
                 "percentage_base is required for percentage-based allowances."
             )
 
         if percentage_base not in AllowancePercentageBasis:
-            raise AllowanceServiceError(
+            raise ValidationError(
                 f"Invalid percentage_base: {percentage_base}"
             )
 
     else:
         if percentage_base is not None:
-            raise AllowanceServiceError(
+            raise ValidationError(
                 "percentage_base is only allowed for percentage-based allowances."
             )
 
@@ -54,8 +53,19 @@ def validate_calculation_basis(
 def ensure_no_duplicate_allowance(existing_allowance) -> None:
     """Ensures no duplicate allowance exists for the same payroll and type."""
     if existing_allowance:
-        raise AllowanceServiceError(f"Allowance of type ID {existing_allowance.allowance_type_id} already exists for payroll ID {existing_allowance.payroll_id}.")
+        raise ValidationError(f"Allowance of type ID {existing_allowance.allowance_type_id} already exists for payroll ID {existing_allowance.payroll_id}.")
 
-def ensure_unique_name(existing_name, name: str)-> None:
+
+def ensure_unique_name(existing_name: str, name: str)-> None:
+    """
+    Docstring for ensure_unique_name
+    
+    :param existing_name: Description
+    :type existing_name: str
+    :param name: Description
+    :type name: str
+    """
+    
     if name == existing_name:
-        raise AllowanceServiceError("Allowance type with this name already exists.")
+        raise ValidationError("Allowance type with this name already exists.")
+

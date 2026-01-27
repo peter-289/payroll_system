@@ -1,55 +1,76 @@
 """Security helpers for authentication, authorization and password management."""
-
 from datetime import date, datetime, timedelta
-from typing import Optional, List
 import os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from pydantic import BaseModel
 from app.core.config import LOGIN_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from app.repositories.employee_repo import EmployeeRepository
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
+from app.domain.exceptions.base import ValidationError
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
+# Credentials exception for invalid tokens
+credentials_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
-#======================================================================================================
-#------------------------ TOKEN DATA ---------------------------------------------------------------
-class TokenData(BaseModel):
-    username: Optional[str] = None
-    permissions: List[str] = []
+
 
 #======================================================================================================
 #------------------------ CREATE A LOGIN TOKEN TO MANAGE SESSIONS -------------------------------------
-def create_login_token(data:dict, expires_delta:timedelta | None = None):
+def create_login_token(data:dict, expires_delta: timedelta | None = None):
+    """
+    Docstring for create_login_token
+    
+    :param data: Data to encode in the token
+    :type data: dict
+    :param expires_delta: Optional expiration time for the token
+    :type expires_delta: timedelta | None
+    """
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=LOGIN_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp":expire})
     token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
+#=====================================================================================================
+#------------------------ GET CURRENT USER -----------------------------------------------------------
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+):
+    """Decode JWT token and return current user info."""
+    
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: int = payload.get("sub")
+        role: str = payload.get("role")
+        
+        if user_id is None or role is None:
+            raise credentials_exception
+     
+    except JWTError:
+        raise credentials_exception
 
+    return {
+         "user_id": user_id, 
+         "role":role
+    }
 
 #======================================================================================================
-#------------------------ DECODE TOKEN ---------------------------------------------------------------
+#------------------------ GET CURRENT EMPLOYEE ---------------------------------------------------------------
 def get_current_employee(
     token: str = Depends(oauth2_scheme),
     db:Session = Depends(get_db)
 ):
-    """Get the current authenticated employee from the JWT token."""
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    """Decode JWT token and return current employee info."""
     employee_repo = EmployeeRepository(db)
     try:
         
@@ -57,59 +78,53 @@ def get_current_employee(
         user_id: int = payload.get("sub")
         role: str = payload.get("role")
         
-        employee = employee_repo.get_employee(user_id)
-    
-
-
-        if user_id is None:
-            print("Token mismatch")
-     
+        employee = employee_repo.get_by_user_id(user_id)
+        if employee is None:
+            raise ValidationError("Failed to get employee for current user")
     except JWTError:
         raise credentials_exception
 
     return {
-         "user_id": user_id, "employee_id":employee.id, "role":role
+         "user_id": user_id,
+         "employee_id":employee.id, 
+         "role":role
     }
-
-
-
-#======================================================================================================
-#------------------------ GET CURRENT ACTIVE USER ---------------------------------------------------
 
 
 #======================================================================================================
 #------------------------ CHECK ADMIN ACCESS -------------------------------------------------------
 def admin_access(
-    current_employee: dict = Depends(get_current_employee)
-):
-    if current_employee.get("role") != "admin":
+    current_user: dict = Depends(get_current_user)
+):  
+
+    if current_user.get("role") != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required"
         )
-    return current_employee
+    return current_user
 
 
 #======================================================================================================
 #------------------------ CHECK HR ACCESS -------------------------------------------------------------
 def hr_access(
-    current_employee: dict = Depends(get_current_employee)
+    current_user: dict = Depends(get_current_user)
 ):
-    if current_employee.get("role") != "hr":
+    if current_user.get("role") != "hr":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="HR access required"
         )
-    return current_employee
+    return current_user
 
 
 def admin_hr_or_self(
-    current_employee: dict = Depends(get_current_employee)
+    current_user: dict = Depends(get_current_employee)
 ):
     """Allow access if current user is admin, hr, or the employee themself."""
-    role = current_employee.get("role")
+    role = current_user.get("role")
     if role in ("admin", "hr", "employee"):
-        return current_employee
+        return current_user
     
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,

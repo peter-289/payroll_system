@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from app.services.pension_service import PensionService
-from app.domain.exceptions.base import PensionServiceError, PensionNotFoundError
+from app.domain.exceptions.base import DomainError, PensionNotFoundError
 from app.schemas.pension_schema import PensionCreate, PensionResponse
 
 router = APIRouter(prefix='/api/v1', tags=['Pension'])
@@ -14,7 +14,7 @@ def create_pension(payload: PensionCreate, db: Session = Depends(get_db)):
         service = PensionService(db)
         p = service.create_pension(payload)
         return p
-    except PensionServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
@@ -41,5 +41,5 @@ def delete_pension(pension_id:int, db: Session = Depends(get_db)):
         return None
     except PensionNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except PensionServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

@@ -4,7 +4,7 @@ from app.core.security import admin_access
 from app.schemas.tax_schema import TaxCreate, TaxResponse, TaxBracketCreate, TaxRuleUpdate, TaxBracketUpdate
 from app.db.database_setup import get_db
 from app.services.tax_service import TaxService
-from app.domain.exceptions.base import TaxServiceError, TaxRuleNotFoundError, InvalidTaxBracketsError
+from app.domain.exceptions.base import DomainError, TaxRuleNotFoundError, InvalidTaxBracketsError
 
 
 
@@ -29,7 +29,7 @@ def add_tax_rule(
         return new_tax_rule
     except InvalidTaxBracketsError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except TaxServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
@@ -47,7 +47,7 @@ def update_tax_rule(
         return tax_rule
     except TaxRuleNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except TaxServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 #======================================================================================================
@@ -66,7 +66,7 @@ def update_tax_brackets(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except InvalidTaxBracketsError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except TaxServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 #======================================================================================================
@@ -98,5 +98,5 @@ def delete_tax_rule(taxes_id:int, db:Session =Depends(get_db)):
         return None
     except TaxRuleNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except TaxServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

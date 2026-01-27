@@ -159,7 +159,6 @@ def seed_positions(db: Session):
 #========================================================================================
 # Seed salaries
 def seed_salaries(db: Session):
-    repo = SalaryService(db)
     today = date.today()
     salaries= [
         {"position_id": 1, "amount": 8000.0, "salary_type": PayFrequency.MONTHLY},
@@ -172,19 +171,22 @@ def seed_salaries(db: Session):
     skipped_count = 0
     try:
         for item in salaries:
-            existing = repo.get_position_salaries(item["position_id"])
+            existing = db.query(PositionSalary).filter(PositionSalary.position_id == item["position_id"]).first()
             if existing:
                 print(f"[*]Salary for position_id {item['position_id']} already exists. Skipping.")
                 skipped_count += 1
                 continue
             else:
-                repo.add_position_salary(
+                salary = PositionSalary(
                     position_id=item["position_id"],
                     amount=item["amount"],
                     salary_type=item["salary_type"],
                     effective_from=today,   
                     created_by=1
                 )
+                db.add(salary)
+                db.commit()
+                db.refresh(salary)
                 print(f"[*]Added {inserted_count} ssalries and skipped {skipped_count} salaries.")
                 inserted_count += 1
             

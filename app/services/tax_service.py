@@ -4,7 +4,7 @@ from app.schemas.tax_schema import TaxBracketCreate, TaxBracketUpdate, TaxCreate
 from app.utils.tax_bracket_validator import validate_no_overlaps
 from app.models.tax_model import TaxType, Tax
 from app.models.tax_brackets import TaxBracket
-from app.domain.exceptions.base import TaxServiceError, TaxRuleNotFoundError, InvalidTaxBracketsError
+from app.domain.exceptions.base import DomainError, TaxRuleNotFoundError, InvalidTaxBracketsError
 from datetime import datetime
 
 
@@ -34,7 +34,7 @@ class TaxService:
         """Check if tax rule with name already exists."""
         existing = self.db.query(Tax).filter(Tax.name == tax_name).first()
         if existing:
-            raise TaxServiceError(f"Tax rule with name '{tax_name}' already exists")
+            raise DomainError(f"Tax rule with name '{tax_name}' already exists")
         return False
     
     def create_tax_rule(self, payload:TaxCreate,):
@@ -55,7 +55,7 @@ class TaxService:
           self.db.flush()  # To get the new_tax_rule.id
         except Exception as e:
             self.db.rollback()
-            raise TaxServiceError(f"Error creating tax rule: {str(e)}")
+            raise DomainError(f"Error creating tax rule: {str(e)}")
         for bracket in payload.brackets:
             new_bracket = TaxBracket(
                 tax_id=new_tax_rule.id,
@@ -69,7 +69,7 @@ class TaxService:
          self.db.refresh(new_tax_rule)
         except Exception as e:
             self.db.rollback()
-            raise TaxServiceError(f"Failed to add tax rule: {e}")
+            raise DomainError(f"Failed to add tax rule: {e}")
         return new_tax_rule
     
     def get_tax_rule(self, tax_id:int):
@@ -96,7 +96,7 @@ class TaxService:
             self.db.refresh(tax_rule)
         except Exception as e:
             self.db.rollback()
-            raise TaxServiceError(f"Failed to update tax rule: {e}")
+            raise DomainError(f"Failed to update tax rule: {e}")
         
         return tax_rule
     
@@ -124,7 +124,7 @@ class TaxService:
             self.db.refresh(tax_rule)
         except Exception as e:
             self.db.rollback()
-            raise TaxServiceError(f"Failed to update tax brackets: {e}")
+            raise DomainError(f"Failed to update tax brackets: {e}")
 
         return tax_rule
     
@@ -135,7 +135,7 @@ class TaxService:
             self.db.commit()
         except Exception as e:
             self.db.rollback()
-            raise TaxServiceError(f"Failed to delete tax rule: {e}")
+            raise DomainError(f"Failed to delete tax rule: {e}")
         return {"message": "Tax rule deleted successfully."}
     
     def list_tax_rules(self, skip:int=0, limit:int=100):

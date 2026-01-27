@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.db.database_setup import get_db
 from app.schemas.allowance_schema import AllowanceTypeCreate, AllowanceTypeResponse
-from app.domain.exceptions.base import AllowanceServiceError, AllowanceTypeNotFoundError
+from app.domain.exceptions.base import DomainError, AllowanceTypeNotFoundError
 from app.repositories.allowance_repo import AllowanceRepository
 from app.services.allowance_service import AllowanceTypeService
 
@@ -20,7 +20,7 @@ def create_allowance_type(payload: AllowanceTypeCreate, service: AllowanceTypeSe
     try:
         allowance_type = service.create_allowance_type(payload)
         return allowance_type
-    except AllowanceServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

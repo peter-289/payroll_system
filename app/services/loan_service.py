@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
 from app.models.Loans_advances_model import Loan
 from sqlalchemy.exc import SQLAlchemyError
-from app.domain.exceptions.base import LoanServiceError, LoanNotFoundError
-
+from app.domain.exceptions.base import DomainError, LoanNotFoundError
+from app.core.unit_of_work import UnitOfWork
+from typing import Optional
 
 class LoanService:
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
 
     def create_loan(self, payload):
         loan = Loan(
@@ -21,24 +22,19 @@ class LoanService:
             status=getattr(payload, 'status', None),
             description=getattr(payload, 'description', None)
         )
-        try:
-            self.db.add(loan)
-            self.db.commit()
-            self.db.refresh(loan)
-        except SQLAlchemyError as e:
-            self.db.rollback()
-            raise LoanServiceError(f"Failed to create loan: {e}")
+        with self.uow:
+            self.uow.loan_repo.save_loan(loan=loan)
         return loan
 
-    def get_loan(self, loan_id:int):
-        l = self.db.query(Loan).filter(Loan.id == loan_id).first()
-        if not l:
+    def get_loan(self, loan_id:int)-> Optional[Loan]:
+        loan = self.uow.loan_repo.get_load_by_id(loan_id)
+        if not loan:
             raise LoanNotFoundError(f"Loan with id {loan_id} not found")
-        return l
+        return loan
     
     def get_employee_loan(self, employee_id:int):
         if employee_id <=0:
-            raise LoanServiceError("Invalid id")
+            raise DomainError("Invalid id")
         loan = self.db.query(Loan).filter(Loan.employee_id == employee_id).first()
         if not loan:
             raise LoanNotFoundError(f"Loan with employee id: {employee_id} not found")
@@ -56,5 +52,5 @@ class LoanService:
             self.db.commit()
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise LoanServiceError(f"Failed to delete loan: {e}")
+            raise DomainError(f"Failed to delete loan: {e}")
         return {"message":"Loan deleted successfully"}

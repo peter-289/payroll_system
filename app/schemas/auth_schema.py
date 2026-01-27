@@ -16,7 +16,5 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str
-    user_id: int
-    username: str
+    force_password_change: bool
     role: str
-    must_change_password:bool

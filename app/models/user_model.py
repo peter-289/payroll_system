@@ -29,3 +29,4 @@ class User(Base):
     employee = relationship("Employee", back_populates="user", uselist=False)
     position_salaries = relationship("PositionSalary", back_populates="user")
     employee_salaries = relationship("EmployeeSalary", back_populates="user")
+    audit_logs = relationship("AuditLog", back_populates="user")

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.services.insuarance_service import InsuranceService
+from app.services.insurance_service import InsuranceService
 from app.schemas.insurance_schema import InsuranceResponse,InsuranceCreate
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from typing import List
-from app.domain.exceptions.base import InsuranceServiceError, InsuranceRecordNotFoundError
+from app.domain.exceptions.base import DomainError, InsuranceRecordNotFoundError
 
 router = APIRouter(prefix="/api/v1", tags=["Insurance"])
 
@@ -16,7 +16,7 @@ def create_insurance(payload:InsuranceCreate, db:Session = Depends(get_db)):
         service = InsuranceService(db)
         insurance = service.create_insurance(payload)
         return insurance
-    except InsuranceServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 #===================================================================================================================
@@ -47,7 +47,7 @@ def soft_delete_policy(insurance_id:int, db:Session = Depends(get_db)):
         return None
     except InsuranceRecordNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except InsuranceServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 #==================================================================================================================
@@ -60,5 +60,5 @@ def delete_insurance(insurance_id:int, db:Session = Depends(get_db)):
         return None
     except InsuranceRecordNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except InsuranceServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

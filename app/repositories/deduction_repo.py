@@ -10,13 +10,13 @@ class DeductionRepository:
 
     def save_deduction(self, deduction: Deduction) -> Deduction:
         self.db.add(deduction)
-        self.db.commit()
-        self.db.refresh(deduction)
+        
+
         return deduction
 
     def update_deduction(self, deduction: Deduction) -> Deduction:
-        self.db.commit()
-        self.db.refresh(deduction)
+        
+
         return deduction
 
     def get_deduction_by_id(self, deduction_id: int) -> Optional[Deduction]:
@@ -30,18 +30,18 @@ class DeductionRepository:
 
     def delete_deduction(self, deduction: Deduction) -> None:
         self.db.delete(deduction)
-        self.db.commit()
+        
 
     # DeductionType methods
     def save_deduction_type(self, deduction_type: DeductionType) -> DeductionType:
         self.db.add(deduction_type)
-        self.db.commit()
-        self.db.refresh(deduction_type)
+        
+
         return deduction_type
 
     def update_deduction_type(self, deduction_type: DeductionType) -> DeductionType:
-        self.db.commit()
-        self.db.refresh(deduction_type)
+        
+
         return deduction_type
     
     def get_deduction_type_by_id(self, id: int) -> Optional[DeductionType]:
@@ -59,13 +59,13 @@ class DeductionRepository:
 
     def delete_deduction_type(self, deduction_type: DeductionType) -> None:
         self.db.delete(deduction_type)
-        self.db.commit()
+        
 
     # DeductionBracket methods
     def save_deduction_bracket(self, bracket: DeductionBracket) -> DeductionBracket:
         self.db.add(bracket)
-        self.db.commit()
-        self.db.refresh(bracket)
+        
+
         return bracket
     
 

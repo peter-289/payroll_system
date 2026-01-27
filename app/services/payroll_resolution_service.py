@@ -7,7 +7,7 @@ from app.services.loan_service import LoanService
 from app.services.insurance_service import InsuranceService
 from app.services.pension_service import PensionService
 from app.services.department_service import DepartmentService
-from app.services.employee_service import EmployeeService
+from app.services.user_service import EmployeeService
 from datetime import date
 from app.schemas.payroll_schema import ResolvedPayrollInputs
 

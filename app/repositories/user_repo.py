@@ -12,8 +12,6 @@ class UserRepository:
         return user
     
     def update(self, user: User) ->User:
-        self.db.commit()
-        self.db.refresh(user)
         return user
     
     def get_user(self, username:str)-> Optional[User]:
@@ -24,4 +22,3 @@ class UserRepository:
     
     def delete(self, user: User)->None:
         self.db.delete(user)
-        self.db.commit()

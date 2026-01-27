@@ -1,6 +1,4 @@
-from typing import List
-from app.domain.exceptions.base import DeductionServiceError
-from app.schemas.deduction_schema import DeductionCreate
+from app.domain.exceptions.base import ValidationError
 
 
 def validate_bracket(brackets) -> None:
@@ -12,13 +10,13 @@ def validate_bracket(brackets) -> None:
         if bracket.min_amount >= bracket.max_amount:
             raise ValueError("Bracket min_amount must be less than max_amount")
         if bracket.rate is None and bracket.fixed_amount is None:
-            raise DeductionServiceError("Bracket must define rate or fixed_amount")
+            raise ValidationError("Bracket must define rate or fixed_amount")
         if bracket.rate is not None and bracket.fixed_amount is not None:
-            raise DeductionServiceError("Bracket cannot define both rate and fixed_amount")
+            raise ValidationError("Bracket cannot define both rate and fixed_amount")
 
 
 def check_unique_names(payload_name:str, existing_name: str) -> None:
     if payload_name == existing_name:
-        raise DeductionServiceError("Deduction names must be unique")
+        raise ValidationError("Deduction names must be unique")
 
 

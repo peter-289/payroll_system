@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from app.services.loan_service import LoanService
-from app.domain.exceptions.base import LoanServiceError, LoanNotFoundError
+from app.domain.exceptions.base import DomainError, LoanNotFoundError
 from app.schemas.loan_schema import LoanCreate, LoanResponse
 
 router = APIRouter(prefix='/api/v1', tags=['Loans'])
@@ -14,7 +14,7 @@ def create_loan(payload: LoanCreate, db: Session = Depends(get_db)):
         service = LoanService(db)
         l = service.create_loan(payload)
         return l
-    except LoanServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
@@ -41,5 +41,5 @@ def delete_loan(loan_id:int, db: Session = Depends(get_db)):
         return None
     except LoanNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except LoanServiceError as e:
+    except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

@@ -9,15 +9,18 @@ class AllowanceRepository:
         self.db = db
 
     def save_allowance(self, allowance: Allowance) -> Allowance:
+        """
+        Save an allowance object
+        """
         self.db.add(allowance)
-        self.db.commit()
-        self.db.refresh(allowance)
+        
+
         return allowance
 
 
     def update_allowance(self, allowance: Allowance) -> Allowance:
-        self.db.commit()
-        self.db.refresh(allowance)
+        
+
         return allowance
     
 
@@ -42,23 +45,23 @@ class AllowanceRepository:
 
     def delete_allowance(self, allowance: Allowance) -> None:
         self.db.delete(allowance)
-        self.db.commit()
+        
 
 
 # ============================================================================================
 # ------------------ ALLOWANCE TYPE METHODS --------------------------------------------------
     def save_allowance_type(self, allowance_type: AllowanceType) -> AllowanceType:
         self.db.add(allowance_type)
-        self.db.commit()
-        self.db.refresh(allowance_type)
+        
+
         return allowance_type
     
     def roll_back(self):
         self.db.rollback()
 
     def update_allowance_type(self, allowance_type: AllowanceType) -> AllowanceType:
-        self.db.commit()
-        self.db.refresh(allowance_type)
+        
+
         return allowance_type
 
     def get_allowance_type_by_id(self, id: int) -> Optional[AllowanceType]:
@@ -75,6 +78,6 @@ class AllowanceRepository:
 
     def delete_allowance_type(self, allowance_type: AllowanceType) -> None:
         self.db.delete(allowance_type)
-        self.db.commit()
+        
     
     

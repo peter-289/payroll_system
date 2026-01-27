@@ -1,5 +1,5 @@
 from datetime import date
-from app.domain.exceptions.base import EmployeeServiceError, ValidationError
+from app.domain.exceptions.base import DomainError, ValidationError
 from app.models.employee_model import SalaryTypeEnum
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -11,7 +11,7 @@ from app.domain.exceptions.base import  PhoneValidationError, AgeValidationError
 def validate_hire_date_not_future(hire_date: date) -> None:
     """Ensure hire date is not in the future."""
     if hire_date and hire_date > date.today():
-        raise EmployeeServiceError("Hire date cannot be in the future")
+        raise DomainError("Hire date cannot be in the future")
 
 
 def validate_salary_type(salary_type) -> None:
@@ -24,7 +24,7 @@ def validate_salary_type(salary_type) -> None:
         # attempt to match by value
         SalaryTypeEnum(salary_type)
     except Exception:
-        raise EmployeeServiceError("Invalid salary type provided")
+        raise DomainError("Invalid salary type provided")
     
 
 MIN_EMPLOYEE_AGE = 18
@@ -79,3 +79,15 @@ def validate_email(email: str) -> None:
         raise EmailValidationError(f"Invalid email address: {str(e)}")
 
 """
+
+def validate_password_strength(new_password: str) -> None:
+    """Validate password strength according to defined criteria.""" 
+ # Validate password strength
+    if len(new_password) < 8:
+            raise DomainError("Password must be at least 8 characters long")
+    if not any(char.isdigit() for char in new_password):
+            raise DomainError("Password must contain at least one digit")
+    if not any(char.isupper() for char in new_password):
+            raise DomainError("Password must contain at least one uppercase letter")
+    if not any(char.islower() for char in new_password):
+            raise DomainError("Password must contain at least one lowercase letter")

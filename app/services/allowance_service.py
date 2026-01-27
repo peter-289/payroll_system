@@ -1,24 +1,34 @@
-from app.repositories.allowance_repo import AllowanceRepository
 from app.domain.rules import allowance_rules
-from app.models.allowances_model import Allowance, AllowanceType, AllowanceStatus
+from app.models.allowances_model import Allowance, AllowanceType
 from app.schemas.allowance_schema import AllowanceCreate, AllowanceTypeCreate
-from app.domain.exceptions.base import AllowanceServiceError, AllowanceTypeNotFoundError, AllowanceRecordNotFoundError
-from sqlalchemy.exc import SQLAlchemyError
+from app.domain.exceptions.base import AllowanceTypeNotFoundError, AllowanceRecordNotFoundError
 import random
+from app.core.unit_of_work import UnitOfWork
 
 
 
 class AllowanceService:
-    def __init__(self, allowance_repo: AllowanceRepository):
-        self.allowance_repo = allowance_repo
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
          
     def create_allowance(self, payload: AllowanceCreate):
-        existing = self.allowance_repo.get_allowance_by_type(payload.allowance_type_id)
-        allowance_rules.ensure_no_duplicate_allowance(existing)
-
-        allowance_type = self.allowance_repo.get_allowance_type_by_id(payload.allowance_type_id)
+        """
+        Docstring for create_allowance
         
+        :param self: Description
+        :param payload: Description
+        :type payload: AllowanceCreate
+        """
+        # Check if an an allowance exists
+        existing = self.uow.allowance_repo.get_allowance_by_type(payload.allowance_type_id)
 
+        # Enforce a business rule to avoid creating duplicate allowances
+        allowance_rules.ensure_no_duplicate_allowance(existing)
+        
+        # Get an allowance type by id from the db
+        allowance_type = self.uow.allowance_repo.get_allowance_type_by_id(payload.allowance_type_id)
+        
+        # Create a new allowance
         new_allowance = Allowance(
             payroll_id=payload.payroll_id,
             allowance_type_id=payload.allowance_type_id,
@@ -27,42 +37,36 @@ class AllowanceService:
             amount=payload.amount,
             is_taxable=allowance_type.is_taxable,
             calculation_basis=payload.calculation_basis,
-            
-            
         )
-        try:
-            return self.allowance_repo.save_allowance(new_allowance)
-        except SQLAlchemyError as e:
-            raise AllowanceServiceError(f"Failed to create new allowance: {e}")
+        
+        with self.uow:
+            return self.uow.allowance_repo.save_allowance(new_allowance)
         
     
     def get_allowances(self):
-        return self.allowance_repo.get_allowances_by_payroll(None)  # This might need adjustment
+        return self.uow.allowance_repo.get_allowances_by_payroll(None)  # This might need adjustment
 
     def get_allowance(self, allowance_id: int):
-        allowance = self.allowance_repo.get_allowance_by_id(allowance_id)
+        allowance = self.uow.allowance_repo.get_allowance_by_id(allowance_id)
         if not allowance:
             raise AllowanceRecordNotFoundError(f"Allowance with id {allowance_id} not found!")
         return allowance
 
     def delete_allowance(self, allowance_id: int):
-        allowance = self.allowance_repo.get_allowance_by_id(allowance_id)
+        allowance = self.uow.allowance_repo.get_allowance_by_id(allowance_id)
         if not allowance:
             raise AllowanceRecordNotFoundError(f"Allowance with id {allowance_id} not found!")
-        try:
-            self.allowance_repo.delete_allowance(allowance)
-            return {"message": f"Allowance with id:{allowance_id} deleted successfully!"}
-        except SQLAlchemyError as e:
-            raise AllowanceServiceError(f"Could not delete allowance: {e}")
-
+        with self.uow:
+            self.uow.allowance_repo.delete_allowance(allowance)
+            
 
 # ============================================================================================
 # -------------- ALLOWANCE TYPE METHODS ------------------------------------------------------
 
 
 class AllowanceTypeService:
-    def __init__(self, allowance_repo: AllowanceRepository):
-        self.allownce_repo = allowance_repo
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
     
     
     def _generate_code(self, name: str) -> str:
@@ -73,7 +77,7 @@ class AllowanceTypeService:
 
     def create_allowance_type(self, payload:AllowanceTypeCreate):
         code = self._generate_code(payload.name)
-        existing_type = self.allownce_repo.get_allowance_type_by_code(code, payload.name)
+        existing_type = self.uow.allowance_repo.get_allowance_type_by_code(code, payload.name)
         allowance_rules.ensure_no_duplicate_allowance(existing_type)
         new_allowance_type = AllowanceType(
                name=payload.name,
@@ -87,20 +91,17 @@ class AllowanceTypeService:
                min_amount=payload.min_amount,
                max_amount=payload.max_amount
             )
-        try:
-           self.allownce_repo.save_allowance_type(new_allowance_type)
-        except SQLAlchemyError as e:
-            self.allownce_repo.roll_back()
-            raise AllowanceServiceError(f"Failed to create new allowance type: {e}")
+        with self.uow:
+               self.uow.allowance_repo.save_allowance_type(new_allowance_type)
         return new_allowance_type
     
 
     def get_allowance_types(self):
-        allowance_types = self.allownce_repo.get_all_allowance_types()
+        allowance_types = self.uow.allowance_repo.get_all_allowance_types()
         return allowance_types
     
     def get_allowance_type(self, id:int):
-        allowance_type = self.allownce_repo.get_allowance_type_by_id(id)
+        allowance_type = self.uow.allowance_repo.get_allowance_type_by_id(id)
         if not allowance_type:
             raise AllowanceTypeNotFoundError(f"Allowance type with id {id} not found!")
         return allowance_type
@@ -109,8 +110,6 @@ class AllowanceTypeService:
         allowance_type = self.allownce_repo.get_allowance_type_by_id(type_id)
         if not allowance_type:
             raise AllowanceTypeNotFoundError(f"Allowance type with id {type_id} not found!")
-        try:
+        with self.uow:
            self.allownce_repo.delete_allowance_type(allowance_type)
-        except SQLAlchemyError as e:
-            self.allownce_repo.roll_back()
-            raise AllowanceServiceError(f"Could not delete allowance type: {e}")
+      

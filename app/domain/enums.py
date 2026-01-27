@@ -18,7 +18,7 @@ class SalaryTypeEnum(str, Enum):
 class GenderEnum(str, Enum):
     MALE = "male"
     FEMALE = "female"
-    NONB_INARY = "non-binary"
+    NON_BINARY = "non-binary"
 
 
 class AllowanceStatus(str, Enum):

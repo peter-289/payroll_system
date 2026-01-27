@@ -7,12 +7,12 @@ imported in different orders.
 """
 
 # Import all model modules to ensure classes are registered with SQLAlchemy
-from . import (
+from app.models import (
+	insurance_model,
 	allowances_model,
 	deductions_model,
 	department_model,
 	employee_model,
-	Insuarance_model,
 	Loans_advances_model,
 	payroll_model,
 	pension_model,
@@ -29,7 +29,7 @@ __all__ = [
 	"deductions_model",
 	"department_model",
 	"employee_model",
-	"Insuarance_model",
+	"insurance_model",
 	"Loans_advances_model",
 	"payroll_model",
 	"pension_model",
