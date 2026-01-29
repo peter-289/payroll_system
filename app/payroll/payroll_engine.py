@@ -28,14 +28,14 @@ class PayrollEngine:
     Supports single employee and batch computations.
     """
 
-    @staticmethod
-    def compute(inputs: ResolvedPayrollInputs) -> PayrollResult:
-        """
-        Compute payroll for given resolved inputs.
+    def __init__(self, config: dict | None = None):
+        self.config = config or {}
 
-        :param inputs: Resolved payroll inputs
-        :return: Payroll result
-        """
+    def compute(self, inputs):
+        # If a simple PayrollInput is provided (legacy), delegate to compute_simple
+        if hasattr(inputs, "earnings"):
+            return self.compute_simple(inputs)
+
         try:
             # Calculate allowances total
             allowances_total = sum(
@@ -134,33 +134,55 @@ class PayrollEngine:
         except Exception as e:
             raise PayrollComputeError(f"Failed to compute payroll: {str(e)}")
 
-    @staticmethod
-    def compute_simple(payload: PayrollInput) -> PayrollResult:
+    def compute_simple(self, payload: PayrollInput) -> PayrollResult:
         """
         Compute payroll for simple PayrollInput (backwards compatibility).
+        Uses `self.config.get('tax_brackets')` when provided, otherwise no tax.
         """
         try:
-            # Gross pay from earnings
+            # Gross pay from all earnings (taxable and non-taxable)
             gross_pay = sum(item.amount for item in payload.earnings)
 
             # Allowances total
             allowances_total = sum(item.amount for item in payload.allowances or [])
 
-            # Taxable income
-            taxable_income = sum(
-                item.amount for item in payload.earnings + (payload.allowances or [])
-                if item.taxable
-            )
-
             # Deductions total
             deductions_total = sum(item.amount for item in payload.deductions or [])
 
-            # Simple tax calculation (assume 10% on taxable)
-            tax_total = taxable_income * 0.1
-            tax_breakdown = [TaxBreakdownItem(name="Income Tax", amount=tax_total, rate=10.0)]
+            # Taxable income = taxable earnings - pre-tax deductions
+            taxable_earnings = sum(item.amount for item in payload.earnings if getattr(item, 'taxable', False))
+            taxable_income = taxable_earnings - deductions_total
+            if taxable_income < 0:
+                taxable_income = 0
+
+            # Tax calculation
+            tax_total = 0.0
+            tax_breakdown = []
+            brackets = self.config.get('tax_brackets') if hasattr(self, 'config') else None
+            if brackets:
+                remaining = taxable_income
+                for b in brackets:
+                    lower = b.get('lower', 0)
+                    upper = b.get('upper')
+                    rate = b.get('rate', 0)
+                    if upper is None:
+                        taxable_in_band = max(0, remaining)
+                    else:
+                        taxable_in_band = max(0, min(remaining, upper - lower))
+                    band_tax = taxable_in_band * rate
+                    if taxable_in_band > 0:
+                        tax_breakdown.append(TaxBreakdownItem(name=f"{int(rate*100)}% band", amount=band_tax, rate=rate*100))
+                    tax_total += band_tax
+                    remaining -= taxable_in_band
+                    if remaining <= 0:
+                        break
+            else:
+                # default: no tax
+                tax_total = 0.0
+                tax_breakdown = [TaxBreakdownItem(name="Income Tax", amount=tax_total, rate=0.0)]
 
             # Net pay
-            net_pay = gross_pay - deductions_total - tax_total
+            net_pay = gross_pay - deductions_total - tax_total + allowances_total
 
             # Line items
             line_items = [
@@ -187,7 +209,7 @@ class PayrollEngine:
                 net_pay=net_pay,
                 employer_costs=gross_pay,
                 line_items=line_items,
-                audit={}
+                audit={"engine_version": self.config.get("engine_version", "1.0")}
             )
 
         except Exception as e:

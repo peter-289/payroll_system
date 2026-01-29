@@ -1,3 +1,4 @@
+"""User model representing system users and their authentication information."""
 from app.db.database_setup import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Date
 from sqlalchemy.orm import relationship
@@ -6,6 +7,30 @@ import datetime
 
 
 class User(Base):
+    """User account model for system authentication and authorization.
+    
+    Attributes:
+        id: Unique identifier for the user.
+        role_id: Foreign key reference to the user's role.
+        first_name: User's first name.
+        last_name: User's last name.
+        username: Unique username for login (required).
+        gender: User's gender.
+        date_of_birth: User's date of birth.
+        password_hash: Hashed password for authentication.
+        status: Account status (active/inactive).
+        last_login: Timestamp of last login.
+        created_at: Timestamp when user account was created.
+        updated_at: Timestamp of last account update.
+        must_change_password: Boolean flag indicating if password change is required.
+    
+    Relationships:
+        role: Associated Role object.
+        employee: Associated Employee object (one-to-one).
+        position_salaries: Associated PositionSalary records.
+        employee_salaries: Associated EmployeeSalary records.
+        audit_logs: Associated AuditLog records.
+    """
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)

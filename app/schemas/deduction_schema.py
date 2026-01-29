@@ -27,3 +27,18 @@ class DeductionResponse(DeductionBase):
 
     class Config:
         from_attributes = True
+
+class DeductionUpdateBase(BaseModel):
+      name: Optional[str]
+      is_statutory: bool = Optional[Field(default=False)]
+      is_taxable: bool = Optional[Field(default=False)]
+      has_brackets: bool = Optional[Field(default=False)]
+
+class DeductionUpdateBracket(BaseModel):
+       min_amount: Optional[Decimal]
+       max_amount: Optional[Decimal] = None
+       rate: Optional[Decimal]
+       fixed_amount: Optional[Decimal] = None
+
+class DeductionUpdate(DeductionUpdateBase):
+      brackets: Optional[DeductionUpdateBracket]

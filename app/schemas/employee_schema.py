@@ -29,9 +29,18 @@ class EmployeeCreate(BaseModel):
       
     model_config = {"from_attributes": True}
 
+class UserResponse(BaseModel):
+      id: int
+      first_name: str
+      username: str
+      
+
+      class Config:
+          from_attributes = True
+
 class EmployeeResponse(BaseModel):
     id: int
-    user_id: int
+    user: UserResponse
     department_id:int
     position_id:int
     hire_date: date

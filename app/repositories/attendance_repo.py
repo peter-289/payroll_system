@@ -1,3 +1,4 @@
+"""Repository for managing Attendance records in the database."""
 from sqlalchemy.orm import Session
 from datetime import date
 from app.models.attendance_model import Attendance
@@ -6,55 +7,51 @@ from app.domain.enums import AttendanceStatus
 
 
 class AttendanceRepository:
-    """Repository for managing Attendance records in the database."""
-    def __init__(self, db:Session):
-        """
-        Docstring for __init__
+    """Repository for attendance database operations.
+    
+    Handles CRUD operations for Attendance records including retrieval by
+    employee, date, and status.
+    """
+    def __init__(self, db: Session):
+        """Initialize the attendance repository.
         
-        :param self: Refference to the current class instance
-        :param db: A database session
-        :type db: Session
+        Args:
+            db: SQLAlchemy session for database operations.
         """
         self.db = db
 
-
     def save_attendance(self, attendance: Attendance) -> Attendance:
-        """
-        Docstring for save
+        """Save a new attendance record to the database.
         
-        :param self: reference to the current instance
-        :param attendance: An Attendance object to be saved
-        :type attendance: Attendance
-        :return: The saved Attendance object
-        :rtype: Attendance
+        Args:
+            attendance: Attendance instance to save.
+            
+        Returns:
+            The saved Attendance instance.
         """
         self.db.add(attendance)
         return attendance
     
-
     def update_attendance(self, attendance: Attendance) -> Attendance:
-        """
-        Docstring for update_attendance
+        """Update an existing attendance record.
         
-        :param self: Refference to the current class instance
-        :param attendance: An attendance object to be updated
-        :type attendance: Attendance
-        :return: Return the saved attendance object
-        :rtype: Attendance
+        Args:
+            attendance: Attendance instance with updated values.
+            
+        Returns:
+            The updated Attendance instance.
         """
         self.db.add(attendance)
         return attendance
     
-
-    def get_latest_attendance(self, employee_id:int)-> Attendance:
-        """
-        Docstring for get_latest_attendance
+    def get_latest_attendance(self, employee_id: int) -> Optional[Attendance]:
+        """Retrieve the latest attendance record for an employee.
         
-        :param self: Refference to the current class instance
-        :param employee_id: An integer associated with an employee
-        :type employee_id: int
-        :return: Returns the latest attendance of an employee
-        :rtype: Attendance
+        Args:
+            employee_id: The employee's ID.
+            
+        Returns:
+            Most recent Attendance instance for the employee, or None if not found.
         """
         return (
             self.db.query(Attendance)
@@ -63,53 +60,44 @@ class AttendanceRepository:
             .first()
         )
     
-
-
-    def get_attendance(self, employee_id:int)->Optional[Attendance]:
-        """
-        Docstring for get_attendance
+    def get_attendance(self, employee_id: int) -> Optional[Attendance]:
+        """Retrieve most recent attendance record for an employee.
         
-        :param self: Refference to the current class instance
-        :param employee_id: An integer associated with an employee
-        :type employee_id: int
-        :return: Return an attendance for an employee or none
-        :rtype: Attendance | None
+        Args:
+            employee_id: The employee's ID.
+            
+        Returns:
+            Most recent Attendance instance, or None if not found.
         """
         return self.db.query(Attendance)\
-       .filter(Attendance.employee_id==employee_id)\
-       .order_by(Attendance.attendance_date.desc())\
-       .first()
+            .filter(Attendance.employee_id == employee_id)\
+            .order_by(Attendance.attendance_date.desc())\
+            .first()
     
-
-    def get_by_employee_and_date(self, employee_id: int, attendance_date: date) -> Attendance | None:
-        """
-        Docstring for get_by_employee_and_date
+    def get_by_employee_and_date(self, employee_id: int, attendance_date: date) -> Optional[Attendance]:
+        """Retrieve attendance record for a specific employee and date.
         
-        :param self: Refference to the current class instance
-        :param employee_id: An integer associated with an employee
-        :type employee_id: int
-        :param attendance_date: Attendance date
-        :type attendance_date: date
-        :return: Return an attendance object by employee and date
-        :rtype: Attendance | None
+        Args:
+            employee_id: The employee's ID.
+            attendance_date: The date of attendance.
+            
+        Returns:
+            Attendance instance if found for that date, None otherwise.
         """
         return (
             self.db.query(Attendance)
-              .filter(
-            Attendance.employee_id == employee_id,
-            Attendance.attendance_date == attendance_date
+            .filter(
+                Attendance.employee_id == employee_id,
+                Attendance.attendance_date == attendance_date
+            )
+            .first()
         )
-        .first()
-    )
 
-    
     def delete_attendance(self, attendance: Attendance) -> None:
-        """
-        Docstring for delete
+        """Delete an attendance record from the database.
         
-        :param self: Refference to the current class instance
-        :param attendance: An attendance object to be deleted
-        :type attendance: Attendance
+        Args:
+            attendance: Attendance instance to delete.
         """
         self.db.delete(attendance)
 

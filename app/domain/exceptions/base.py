@@ -1,3 +1,8 @@
+"""Domain layer exceptions for the payroll system.
+
+All domain exceptions inherit from DomainError and represent business logic violations.
+These exceptions should be caught by the service layer and converted to API responses.
+"""
 from typing import Any
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
@@ -6,44 +11,55 @@ from fastapi.responses import JSONResponse
 # =======================================================================================================
 #-------------------- DOMAIN BASE EXCEPTIONS -----------------------------------------------------
 class DomainError(Exception):
-    """Base exception for all domain errors"""
+    """Base exception for all domain errors.
+    
+    This is the root exception for all domain layer errors. Services should catch
+    this exception and convert it to appropriate HTTP responses.
+    """
     def __init__(self, message: str | None = None):
+        """Initialize domain error with message.
+        
+        Args:
+            message: Error message describing what went wrong.
+        """
         super().__init__(message or "Domain error")
 
 class NotFoundError(DomainError):
-    """Exception for not found errors in the domain"""
+    """Exception raised when a requested resource is not found in the domain."""
     pass
 
 class ConflictError(DomainError):
-    """Exception for conflict errors in the domain"""
+    """Exception raised when a domain operation conflicts with existing state."""
     pass
 
 class ValidationError(DomainError):
-    """Exception for validation errors in the domain"""
+    """Exception raised when domain data fails validation rules."""
     pass
 
 class PermissionError(DomainError):
-    """Exception for permission errors in the domain"""
+    """Exception raised when a user lacks required permissions for an operation."""
     pass
 
 class ComputationError(DomainError):
-    """Exception for computation errors in the domain"""
+    """Exception raised when domain computation/calculation fails."""
     pass
-
-
 
 #===============================================================================================
 #---------------- VALIDATION EXCEPTIONS -------------------------------------------------------
 class EmailValidationError(ValidationError):
+    """Exception raised when email validation fails."""
     pass
 
 class PhoneValidationError(ValidationError):
+    """Exception raised when phone number validation fails."""
     pass
 
 class AgeValidationError(ValidationError):
+    """Exception raised when age validation fails."""
     pass
 
 class AccountValidationError(ValidationError):
+    """Exception raised when account-related validation fails."""
     pass
 
 

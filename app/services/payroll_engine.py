@@ -1,3 +1,6 @@
+# Compatibility wrapper: re-export the full PayrollEngine implementation
+# from the `app.payroll` package so tests importing
+# `app.services.payroll_engine.PayrollEngine` get the correct class.
 from decimal import Decimal
 from dataclasses import dataclass
 
@@ -13,21 +16,4 @@ class GrossPayInput:
     overtime_rate: Decimal  # already resolved
     overtime_multiplier: Decimal = Decimal("1.5")
 
-
-class PayrollEngine:
-    @staticmethod
-    def calculate(input: GrossPayInput) -> Decimal:
-        if input.base_pay < 0:
-            raise ComputeError("Base pay cannot be negative")
-
-        gross = input.base_pay + input.allowance_total
-
-        if input.overtime_hours > 0:
-            overtime_pay = (
-                input.overtime_rate
-                * input.overtime_multiplier
-                * input.overtime_hours
-            )
-            gross += overtime_pay
-
-        return gross.quantize(Decimal("0.00"))
+from app.payroll.payroll_engine import PayrollEngine  # noqa: F401

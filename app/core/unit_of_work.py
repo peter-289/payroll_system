@@ -17,9 +17,18 @@ from app.repositories.loan_repository import LoanRepository
 
 
 class UnitOfWork:
-    """Unit of Work pattern implementation for managing database transactions."""
+    """Unit of Work pattern implementation for managing database transactions.
+    
+    Provides centralized access to all repositories and manages transaction boundaries
+    (commit/rollback). Uses lazy-loading to instantiate repositories only when needed.
+    Supports context manager protocol for automatic transaction handling.
+    """
     def __init__(self, session: Session):
-        """Initialize the UnitOfWork with a database session."""
+        """Initialize the UnitOfWork with a database session.
+        
+        Args:
+            session: SQLAlchemy session object for database operations.
+        """
         self.session = session
         self._attendance_repo = None
         self._employee_repo = None
@@ -127,16 +136,29 @@ class UnitOfWork:
             self._loan_repo = LoanRepository(self.session)
         return self._loan_repo
     
-    def commit(self):
+    def commit(self) -> None:
+        """Commit the current transaction to the database."""
         self.session.commit()
 
-    def rollback(self):
+    def rollback(self) -> None:
+        """Rollback the current transaction, undoing all pending changes."""
         self.session.rollback()
 
     def __enter__(self):
+        """Enter context manager - returns self for use in with statement."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Exit context manager - automatically commits or rollbacks transaction.
+        
+        Args:
+            exc_type: Exception type if an exception occurred.
+            exc_val: Exception value if an exception occurred.
+            exc_tb: Exception traceback if an exception occurred.
+            
+        If an exception occurred, the transaction is rolled back.
+        Otherwise, the transaction is committed.
+        """
         if exc_type:
             self.rollback()
         else:

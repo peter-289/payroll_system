@@ -1,3 +1,9 @@
+"""Configuration module for the payroll system application.
+
+This module handles all application configuration including database connection,
+security settings, and authentication parameters loaded from environment variables.
+All values default to safe development settings if environment variables are not set.
+"""
 import os
 from pathlib import Path
 #from fastapi_mail import ConnectionConfig

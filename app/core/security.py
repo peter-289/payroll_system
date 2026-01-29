@@ -9,6 +9,7 @@ from app.repositories.employee_repo import EmployeeRepository
 from sqlalchemy.orm import Session
 from app.db.database_setup import get_db
 from app.domain.exceptions.base import ValidationError
+from app.core.hashing import hash_password, verify_password
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -26,14 +27,15 @@ credentials_exception = HTTPException(
 
 #======================================================================================================
 #------------------------ CREATE A LOGIN TOKEN TO MANAGE SESSIONS -------------------------------------
-def create_login_token(data:dict, expires_delta: timedelta | None = None):
-    """
-    Docstring for create_login_token
+def create_login_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    """Create a JWT login token with encoded data and expiration time.
     
-    :param data: Data to encode in the token
-    :type data: dict
-    :param expires_delta: Optional expiration time for the token
-    :type expires_delta: timedelta | None
+    Args:
+        data: Dictionary containing token payload (should include 'sub' for user_id and 'role').
+        expires_delta: Optional custom expiration time. If None, uses LOGIN_TOKEN_EXPIRE_MINUTES.
+        
+    Returns:
+        Encoded JWT token string.
     """
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=LOGIN_TOKEN_EXPIRE_MINUTES))
@@ -45,8 +47,18 @@ def create_login_token(data:dict, expires_delta: timedelta | None = None):
 #------------------------ GET CURRENT USER -----------------------------------------------------------
 def get_current_user(
     token: str = Depends(oauth2_scheme),
-):
-    """Decode JWT token and return current user info."""
+) -> dict:
+    """Decode JWT token and return current user information.
+    
+    Args:
+        token: JWT bearer token from request header.
+        
+    Returns:
+        Dictionary containing user_id and role.
+        
+    Raises:
+        HTTPException: If token is invalid or credentials cannot be validated.
+    """
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -68,9 +80,21 @@ def get_current_user(
 #------------------------ GET CURRENT EMPLOYEE ---------------------------------------------------------------
 def get_current_employee(
     token: str = Depends(oauth2_scheme),
-    db:Session = Depends(get_db)
-):
-    """Decode JWT token and return current employee info."""
+    db: Session = Depends(get_db)
+) -> dict:
+    """Decode JWT token and return current employee information.
+    
+    Args:
+        token: JWT bearer token from request header.
+        db: SQLAlchemy database session.
+        
+    Returns:
+        Dictionary containing user_id, employee_id, and role.
+        
+    Raises:
+        HTTPException: If token is invalid or employee record not found.
+        ValidationError: If employee cannot be retrieved for the user.
+    """
     employee_repo = EmployeeRepository(db)
     try:
         
@@ -95,7 +119,18 @@ def get_current_employee(
 #------------------------ CHECK ADMIN ACCESS -------------------------------------------------------
 def admin_access(
     current_user: dict = Depends(get_current_user)
-):  
+) -> dict:
+    """Verify that the current user has admin role access.
+    
+    Args:
+        current_user: Current user dictionary from get_current_user dependency.
+        
+    Returns:
+        The current user dictionary if authorized.
+        
+    Raises:
+        HTTPException: If user does not have admin role.
+    """
 
     if current_user.get("role") != "admin":
         raise HTTPException(
@@ -109,7 +144,18 @@ def admin_access(
 #------------------------ CHECK HR ACCESS -------------------------------------------------------------
 def hr_access(
     current_user: dict = Depends(get_current_user)
-):
+) -> dict:
+    """Verify that the current user has HR role access.
+    
+    Args:
+        current_user: Current user dictionary from get_current_user dependency.
+        
+    Returns:
+        The current user dictionary if authorized.
+        
+    Raises:
+        HTTPException: If user does not have HR role.
+    """
     if current_user.get("role") != "hr":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -120,8 +166,18 @@ def hr_access(
 
 def admin_hr_or_self(
     current_user: dict = Depends(get_current_employee)
-):
-    """Allow access if current user is admin, hr, or the employee themself."""
+) -> dict:
+    """Verify access for admin, HR, or the employee accessing their own record.
+    
+    Args:
+        current_user: Current employee dictionary from get_current_employee dependency.
+        
+    Returns:
+        The current user dictionary if authorized.
+        
+    Raises:
+        HTTPException: If user does not have admin/hr role or is not the employee owner.
+    """
     role = current_user.get("role")
     if role in ("admin", "hr", "employee"):
         return current_user
@@ -134,7 +190,18 @@ def admin_hr_or_self(
 
 #======================================================================================================
 #------------------------ PARSE DATE FROM DIFFERENT FORMATS ---------------------------------------------
-def parse_date(value):
+def parse_date(value) -> date:
+    """Parse date from multiple common formats.
+    
+    Args:
+        value: Date value as date object or string in various formats.
+        
+    Returns:
+        Parsed date object.
+        
+    Raises:
+        HTTPException: If date format is not recognized.
+    """
     if isinstance(value, date):
         return value
     elif isinstance(value, str):
@@ -169,8 +236,15 @@ def parse_date(value):
 #------------------------------------------------------------------------------------------------
 #           ----- CREATE TEMPORARY PASSWORD ------
 #------------------------------------------------------------------------------------------------
-def create_temporary_password(length:int = 12) -> str:
-    """Generate a random temporary password of specified length."""
+def create_temporary_password(length: int = 12) -> str:
+    """Generate a random temporary password of specified length.
+    
+    Args:
+        length: Desired password length (default 12).
+        
+    Returns:
+        Random password string containing uppercase, lowercase, digits, and special characters.
+    """
     characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()"
     password = ''.join(
         characters[os.urandom(1)[0] % len(characters)]

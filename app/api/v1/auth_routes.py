@@ -1,3 +1,4 @@
+"""Authentication API routes for user login and password management."""
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from sqlalchemy.orm import Session
 from app.core.unit_of_work import UnitOfWork
@@ -10,10 +11,18 @@ from app.db.database_setup import get_db
 
 
 router = APIRouter(
-    prefix="/auth",tags=["Authentication"]
+    prefix="/auth", tags=["Authentication"]
 )
 
 def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
+    """Dependency to get AuthService with UnitOfWork.
+    
+    Args:
+        db: Database session.
+        
+    Returns:
+        AuthService instance.
+    """
     uow = UnitOfWork(db)
     return AuthService(uow)
 
@@ -22,12 +31,23 @@ def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
 #================================================================================================================
 @router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
 def login(
-    form_data:OAuth2PasswordRequestForm = Depends(),
-    service:AuthService = Depends(get_auth_service),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    service: AuthService = Depends(get_auth_service),
 ):
+    """Authenticate user with credentials and return JWT token.
+    
+    Args:
+        form_data: OAuth2 password request form containing username and password.
+        service: Authentication service instance.
+        
+    Returns:
+        LoginResponse containing access token, token type, password change flag, and role.
+        
+    Raises:
+        HTTPException: 401 if credentials are invalid, 400 if service error occurs.
+    """
     username = form_data.username
     password = form_data.password
-    """Authenticate user and return a login token."""
     try:
         token_data = service.authenticate_user(username, password)
         return token_data
@@ -41,11 +61,23 @@ def login(
 #================================================================================================================
 @router.post("/password")
 def change_password(
-    new_password:str = Form(...),
+    new_password: str = Form(...),
     current_employee: dict = Depends(get_current_employee),
-    db:Session = Depends(get_db)
-    
+    db: Session = Depends(get_db)
 ):
+    """Change the current user's password.
+    
+    Args:
+        new_password: New password to set.
+        current_employee: Current authenticated employee from JWT token.
+        db: Database session.
+        
+    Returns:
+        Dictionary with success message.
+        
+    Raises:
+        HTTPException: 404 if user not found, 400 if validation or database error occurs.
+    """
     service = AuthService(UnitOfWork(db))
     try:
         return service.change_password(current_employee["user_id"], new_password)

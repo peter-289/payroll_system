@@ -1,3 +1,8 @@
+"""Password hashing module using Argon2 algorithm.
+
+This module provides secure password hashing and verification using the Argon2
+password hashing algorithm with normalized Unicode passwords.
+"""
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 import unicodedata
@@ -12,29 +17,45 @@ ph = PasswordHasher(
 
 
 
-def _normalize_password(password:str)->str:
-    """
-    Normalize password
-    params password: str
+def _normalize_password(password: str) -> str:
+    """Normalize password using NFKC Unicode normalization.
+    
+    Args:
+        password: The plain text password to normalize.
+        
+    Returns:
+        The normalized password string.
     """
     return unicodedata.normalize("NFKC", password)
 
 
-def hash_password(password:str):
-    """
-    Hash password:
-    params password: str
+def hash_password(password: str) -> str:
+    """Hash a password using Argon2 algorithm.
+    
+    Args:
+        password: The plain text password to hash.
+        
+    Returns:
+        The hashed password string.
     """
     password = _normalize_password(password)
     hashed = ph.hash(password)
     return hashed
 
 
-def verify_password(stored_hash:str, password:str)-> Optional[str]:
-    """
-    Verify password 
-    params stored_hash: str, password: str
-
+def verify_password(stored_hash: str, password: str) -> Optional[str]:
+    """Verify a password against a stored hash and optionally rehash.
+    
+    Args:
+        stored_hash: The previously hashed password.
+        password: The plain text password to verify.
+        
+    Returns:
+        A new hash if rehashing is needed, the original hash if password matches,
+        or None if verification fails.
+        
+    Raises:
+        RuntimeError: If the stored hash is invalid.
     """
     password = _normalize_password(password)
     try:

@@ -1,3 +1,4 @@
+"""Service for managing user and employee operations."""
 from typing import List, Optional
 from app.models.user_model import User
 from app.models.employee_model import Employee
@@ -27,12 +28,28 @@ from app.domain.rules.employee_rules import validate_hire_date_not_future,valida
 
 
 class EmployeeService:
-    """Service class for managing employee-related operations."""
+    """Service for managing employee-related operations.
+    
+    Handles employee creation, updates, validation, and bank account/contact management.
+    Uses Unit of Work pattern for transaction management.
+    """
     def __init__(self, uow: UnitOfWork) -> None:
+        """Initialize the employee service.
+        
+        Args:
+            uow: Unit of Work instance for database operations.
+        """
         self.uow = uow
 
-    def check_id(self, id_value:int | List[int] | tuple[int, ...])->None:
-        """Checks if an ID or list/tuple of IDs are valid (greater than 0)"""
+    def check_id(self, id_value: int | List[int] | tuple[int, ...]) -> None:
+        """Validate that ID or list of IDs are all positive integers.
+        
+        Args:
+            id_value: Single ID, list of IDs, or tuple of IDs to validate.
+            
+        Raises:
+            ValidationError: If any ID is not greater than 0.
+        """
         ids = [id_value] if isinstance(id_value, int) else list(id_value) 
         for id_ in ids:
             if id_ <= 0:
@@ -40,31 +57,67 @@ class EmployeeService:
         return None
 
     def _check_existing_user(self, username: str) -> None:
-        """Check if a username exists"""
+        """Check if a username already exists.
+        
+        Args:
+            username: Username to check.
+            
+        Raises:
+            UserAlreadyExistsError: If username is already taken.
+        """
         existing_user = self.uow.user_repo.get_user(username)
         if existing_user:
             raise UserAlreadyExistsError(f"Username '{username}' already exists")
         return None
     
-
     def _check_role(self, rolename: str) -> Role:
-        """Check if a role exists"""
+        """Verify that a role exists.
+        
+        Args:
+            rolename: The role name to verify.
+            
+        Returns:
+            The Role instance if found.
+            
+        Raises:
+            RoleNotFoundError: If role does not exist.
+        """
         role = self.uow.role_repo.get_role_by_name(rolename)
         if not role:
             raise RoleNotFoundError(f"Role '{rolename}' does not exist")
         return role
 
-
     def _check_department(self, department_name: str) -> Department:
-        """Check if a department exists"""
+        """Verify that a department exists.
+        
+        Args:
+            department_name: The department name to verify.
+            
+        Returns:
+            The Department instance if found.
+            
+        Raises:
+            DepartmentNotFoundError: If department does not exist.
+        """
         department = self.uow.department_repo.get_department_by_name(department_name)
         if not department:
             raise DepartmentNotFoundError(f"Department '{department_name}' does not exist")
         return department
 
-
     def _check_position(self, department_name: str, position_title: str) -> Position:
-        """Check if a position exists within a department"""
+        """Verify that a position exists in a department.
+        
+        Args:
+            department_name: The department name.
+            position_title: The position title to verify.
+            
+        Returns:
+            The Position instance if found.
+            
+        Raises:
+            DepartmentNotFoundError: If department does not exist.
+            PositionNotFoundError: If position does not exist in the department.
+        """
         department = self._check_department(department_name)
         
         position = self.uow.position_repo.positions_department(department.id)
@@ -72,9 +125,15 @@ class EmployeeService:
             raise PositionNotFoundError(f"Position '{position_title}' does not exist in the {department_name} department")
         return position
 
-
     def _check_existing_contact(self, email: str) -> None:
-        """ Check if an email contact exists"""
+        """Check if an email contact already exists.
+        
+        Args:
+            email: Email address to check.
+            
+        Raises:
+            ContactAlreadyExistsError: If email is already registered.
+        """
         email_contact = self.uow.contacts_repo.get_contact(email)
         if email_contact:
             raise ContactAlreadyExistsError(f"Email '{email}' already exists")
@@ -191,7 +250,7 @@ class EmployeeService:
                 )
             
             
-      
+    
     def get_employee_by_id(self, employee_id: int) -> Employee:
         """Retrieve an employee by ID with related data"""
         self.check_id(employee_id)
