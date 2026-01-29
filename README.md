@@ -143,7 +143,7 @@ pytest
 
 ## Security
 
-- Password hashing with bcrypt
+- Password hashing with argon2
 - JWT token authentication
 - Role-based access control
 - Input validation with Pydantic
